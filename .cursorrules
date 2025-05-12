@@ -1,0 +1,42 @@
+# DRAMPA Project Intelligence
+
+## Design Patterns
+
+### Color Scheme
+- Primary brand color: #FF7722 (orange)
+- Neutral background: white
+- Light orange background: #FFF0E6
+- Dark orange (hover): #E65100
+- Text: Neutral/gray for body, primary color for headings
+
+### Component Architecture
+- UI components should be placed in src/components/ui/
+- Section components should be placed in src/components/sections/
+- MagicUI components should be adapted with orange theming
+
+### Code Style Preferences
+- Use functional components with hooks
+- Arrow function syntax for component definitions
+- Tailwind CSS for styling
+- TypeScript interfaces for props
+- JSDoc comments for component documentation
+
+### Implementation Specifics
+- For file uploads, use react-dropzone
+- For animations, use framer-motion sparingly for performance
+- Session storage is used for cross-page state persistence
+- Prefer grid layout for responsive designs
+- Use radial gradient masks for subtle visual effects
+
+## User Workflow Preferences
+- Focus on simplicity and clarity in UI
+- Provide visual feedback during async operations (loading states)
+- Ensure mobile responsiveness for all components
+- Use orange buttons for primary actions
+- Use outlined/light buttons for secondary actions
+
+## Current Development Focus
+- DotPattern component with orange dots and radial gradient
+- File upload functionality in hero section
+- Redirection to dashboard after successful upload
+- Responsive design across all viewport sizes 
