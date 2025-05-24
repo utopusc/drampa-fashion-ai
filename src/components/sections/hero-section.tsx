@@ -34,13 +34,14 @@ export function HeroSection() {
   };
 
   return (
-    <section id="hero" className="w-full relative overflow-hidden bg-white pt-16 pb-16 md:pt-20 md:pb-20 lg:pt-24 lg:pb-24">
+    <section id="hero" className="w-full relative overflow-hidden pt-16 pb-16 md:pt-20 md:pb-20 lg:pt-24 lg:pb-24 bg-background">
       <div className="absolute inset-0 -z-10">
         <DotPattern 
           width={40}
           height={40}
           cr={4}
           glow={false}
+          className="opacity-80"
         />
       </div>
       
@@ -49,14 +50,14 @@ export function HeroSection() {
           {/* Left Column: Hero Content */}
           <div className="flex flex-col gap-5">
             <div>
-              <p className="inline-flex h-8 items-center gap-2 rounded-full bg-[#FFF0E6] dark:bg-[#331400] border border-[#FFCCAA] dark:border-[#662900] px-3 text-sm font-medium text-[#FF7722]">
+              <p className="inline-flex h-8 items-center gap-2 rounded-full bg-secondary/30 dark:bg-secondary/20 border border-secondary-foreground/10 px-3 text-sm font-medium text-primary">
                 {hero.badgeIcon}
                 {hero.badge}
               </p>
             </div>
 
             <div className="space-y-4">
-              <h1 className="text-3xl md:text-4xl font-bold text-primary">
+              <h1 className="text-3xl md:text-4xl font-bold text-foreground">
                 {hero.title}
               </h1>
               <p className="text-base text-muted-foreground font-normal leading-relaxed max-w-md">
@@ -66,13 +67,13 @@ export function HeroSection() {
               <div className="flex items-center gap-4 pt-2">
                 <Link
                   href={hero.cta.primary.href}
-                  className="bg-[#FF7722] h-10 flex items-center justify-center text-sm font-medium tracking-wide rounded-lg text-white px-5 shadow-md border border-white/[0.12] hover:bg-[#E65100] transition-all ease-out"
+                  className="bg-primary h-10 flex items-center justify-center text-sm font-medium tracking-wide rounded-lg text-primary-foreground px-5 shadow-md border border-primary/10 hover:bg-primary/90 transition-all ease-out"
                 >
                   {hero.cta.primary.text}
                 </Link>
                 <Link
                   href={hero.cta.secondary.href}
-                  className="h-10 flex items-center justify-center px-5 text-sm font-medium tracking-wide text-primary rounded-lg transition-all ease-out bg-[#FFF0E6] dark:bg-[#331400] border border-[#FFCCAA] dark:border-[#662900] hover:bg-[#FFE0CC] dark:hover:bg-[#4D1F00]"
+                  className="h-10 flex items-center justify-center px-5 text-sm font-medium tracking-wide text-primary rounded-lg transition-all ease-out bg-secondary/30 dark:bg-secondary/20 border border-secondary-foreground/10 hover:bg-secondary/50 dark:hover:bg-secondary/30"
                 >
                   {hero.cta.secondary.text}
                 </Link>
@@ -81,10 +82,10 @@ export function HeroSection() {
           </div>
           
           {/* Right Column: Upload Component */}
-          <div className="relative">
-            <div className="text-center mb-6">
-              <h2 className="text-xl font-semibold mb-2 text-primary">Upload Your Product Image</h2>
-              <p className="text-muted-foreground text-sm max-w-md mx-auto">Upload your product image to create a personalized AI fashion model</p>
+          <div className="relative bg-card/50 dark:bg-card/30 rounded-xl p-6 border border-border shadow-sm backdrop-blur-sm">
+            <div className="text-center mb-4">
+              <h2 className="text-xl font-semibold text-foreground">Magic Fashion Transformation</h2>
+              <p className="text-muted-foreground text-sm max-w-md mx-auto mt-1">Drop your product image and watch AI create fashion models wearing it</p>
             </div>
             
             <div className="relative transform transition-all">
@@ -94,7 +95,7 @@ export function HeroSection() {
                 <Button 
                   onClick={handleContinue}
                   disabled={files.length === 0 || isLoading}
-                  className="bg-[#FF7722] h-10 text-sm font-medium rounded-lg text-white px-6 shadow-md border border-white/[0.12] hover:bg-[#E65100] transition-all ease-out w-full max-w-xs mx-auto"
+                  className="bg-primary h-10 text-sm font-medium rounded-lg text-primary-foreground px-6 shadow-md border border-primary/10 hover:bg-primary/90 transition-all ease-out w-full max-w-xs mx-auto"
                 >
                   {isLoading ? (
                     <div className="flex items-center gap-2 justify-center">
@@ -105,7 +106,7 @@ export function HeroSection() {
                       Processing...
                     </div>
                   ) : (
-                    "Continue to Dashboard"
+                    "Transform & Visualize"
                   )}
                 </Button>
                 

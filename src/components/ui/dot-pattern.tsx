@@ -57,7 +57,7 @@ interface DotPatternProps extends React.SVGProps<SVGSVGElement> {
  * - Automatically responds to container size changes
  * - When glow is enabled, dots will animate with random delays and durations
  * - Uses Motion for animations
- * - Dots color can be controlled via the text color utility classes
+ * - Dots color can be controlled via CSS variables
  */
 
 export function DotPattern({
@@ -112,15 +112,15 @@ export function DotPattern({
       ref={containerRef}
       aria-hidden="true"
       className={cn(
-        "pointer-events-none absolute inset-0 h-full w-full [mask-image:radial-gradient(300px_circle_at_center,white,transparent)]",
+        "pointer-events-none absolute inset-0 h-full w-full [mask-image:radial-gradient(600px_circle_at_center,white,transparent)]",
         className,
       )}
       {...props}
     >
       <defs>
-        <radialGradient id={`${id}-gradient`}>
-          <stop offset="0%" stopColor="#FF7722" stopOpacity="1" />
-          <stop offset="100%" stopColor="#FF7722" stopOpacity="0" />
+        <radialGradient id={`${id}-gradient-light`}>
+          <stop offset="0%" stopColor="var(--primary)" stopOpacity="1" />
+          <stop offset="100%" stopColor="var(--primary)" stopOpacity="0" />
         </radialGradient>
       </defs>
       {dots.map((dot, index) => (
@@ -129,8 +129,8 @@ export function DotPattern({
           cx={dot.x}
           cy={dot.y}
           r={cr}
-          fill={glow ? `url(#${id}-gradient)` : "#FF7722"}
-          className="text-[#FF7722]"
+          fill={glow ? `url(#${id}-gradient-light)` : "currentColor"}
+          className="text-primary/60 dark:text-primary/80"
           initial={glow ? { opacity: 0.4, scale: 1 } : {}}
           animate={
             glow

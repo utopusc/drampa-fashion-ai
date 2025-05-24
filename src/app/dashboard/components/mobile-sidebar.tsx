@@ -2,186 +2,252 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { AnimatePresence, motion } from "motion/react";
+import { Menu, X, LayoutDashboard, BarChart3, ShoppingBag, Users, FolderKanban, Settings, MessageSquare, HelpCircle, LogOut, Search } from "lucide-react";
+import { usePathname } from "next/navigation";
+
+// Animation variants
+const overlayVariants = {
+  hidden: { opacity: 0 },
+  visible: { opacity: 1 },
+  exit: { opacity: 0 },
+};
+
+const drawerVariants = {
+  hidden: { opacity: 0, x: -300 },
+  visible: {
+    opacity: 1,
+    x: 0,
+    transition: {
+      type: "spring",
+      damping: 25,
+      stiffness: 300,
+      staggerChildren: 0.05,
+    },
+  },
+  exit: {
+    opacity: 0,
+    x: -300,
+    transition: { duration: 0.2 },
+  },
+};
+
+const menuItemVariants = {
+  hidden: { opacity: 0, x: -10 },
+  visible: { 
+    opacity: 1, 
+    x: 0,
+    transition: { duration: 0.2 }
+  },
+};
+
+// Navigation sections
+const navigationItems = [
+  {
+    title: "Main",
+    links: [
+      {
+        name: "Dashboard",
+        href: "/dashboard",
+        icon: <LayoutDashboard className="w-5 h-5" />,
+      },
+      {
+        name: "Analytics",
+        href: "/dashboard/analytics",
+        icon: <BarChart3 className="w-5 h-5" />,
+      },
+      {
+        name: "Products",
+        href: "/dashboard/products",
+        icon: <ShoppingBag className="w-5 h-5" />,
+      },
+    ],
+  },
+  {
+    title: "Content",
+    links: [
+      {
+        name: "Models",
+        href: "/dashboard/models",
+        icon: <Users className="w-5 h-5" />,
+      },
+      {
+        name: "Collections",
+        href: "/dashboard/collections",
+        icon: <FolderKanban className="w-5 h-5" />,
+      },
+    ],
+  },
+  {
+    title: "Account",
+    links: [
+      {
+        name: "Settings",
+        href: "/dashboard/settings",
+        icon: <Settings className="w-5 h-5" />,
+      },
+      {
+        name: "Support",
+        href: "/dashboard/support",
+        icon: <MessageSquare className="w-5 h-5" />,
+      },
+      {
+        name: "Help",
+        href: "/dashboard/help",
+        icon: <HelpCircle className="w-5 h-5" />,
+      },
+    ],
+  },
+];
 
 const DemoUser = {
   name: "Demo Kullanıcı",
   email: "demo@drampa.app",
-  avatar: "https://ui-avatars.com/api/?name=Demo+Kullanıcı&background=FF7722&color=fff"
+  avatar: "https://ui-avatars.com/api/?name=Demo+Kullanıcı&background=FF7722&color=fff",
+  role: "Free Plan"
 };
 
 export default function MobileSidebar() {
   const [isOpen, setIsOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const pathname = usePathname();
+
+  const toggleSidebar = () => {
+    setIsOpen(!isOpen);
+  };
+
+  const closeSidebar = () => {
+    setIsOpen(false);
+  };
 
   return (
     <>
-      <button 
-        onClick={() => setIsOpen(true)}
-        className="md:hidden flex items-center justify-center"
+      <button
+        onClick={toggleSidebar}
+        className="lg:hidden p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
+        aria-label="Open menu"
       >
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
-          <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
-        </svg>
+        <Menu className="w-6 h-6 text-gray-700 dark:text-gray-300" />
       </button>
 
-      {isOpen && (
-        <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm md:hidden">
-          <div className="fixed left-0 top-0 h-full w-3/4 max-w-xs bg-[#FFF0E6] dark:bg-[#331400]/30 shadow-lg">
-            <div className="flex flex-col h-full">
-              <div className="p-4 bg-[#FF9966]/10 flex items-center justify-between">
-                <Link href="/" className="flex items-center gap-2">
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6 text-[#FF7722]">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
-                  </svg>
-                  <span className="text-lg font-semibold">Drampa</span>
+      <AnimatePresence>
+        {isOpen && (
+          <>
+            {/* Backdrop */}
+            <motion.div
+              key="backdrop"
+              initial="hidden"
+              animate="visible"
+              exit="exit"
+              variants={overlayVariants}
+              className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+              onClick={closeSidebar}
+            />
+
+            {/* Sidebar */}
+            <motion.div
+              key="sidebar"
+              initial="hidden"
+              animate="visible"
+              exit="exit"
+              variants={drawerVariants}
+              className="fixed top-0 left-0 bottom-0 w-[280px] bg-white dark:bg-gray-800 z-50 lg:hidden flex flex-col"
+            >
+              <div className="flex items-center justify-between h-16 px-4 border-b border-gray-200 dark:border-gray-700">
+                <Link href="/dashboard" className="flex items-center gap-2" onClick={closeSidebar}>
+                  <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center text-white font-bold">
+                    D
+                  </div>
+                  <span className="text-lg font-bold text-gray-900 dark:text-white">
+                    DRAMPA
+                  </span>
                 </Link>
-                <button onClick={() => setIsOpen(false)}>
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                  </svg>
+                <button
+                  onClick={closeSidebar}
+                  className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
+                  aria-label="Close menu"
+                >
+                  <X className="w-5 h-5 text-gray-700 dark:text-gray-300" />
                 </button>
               </div>
-              
-              <div className="p-4">
-                <div className="flex items-center gap-3 bg-white/50 dark:bg-[#331400]/20 p-3 rounded-lg">
-                  <img src={DemoUser.avatar} alt={DemoUser.name} className="w-10 h-10 rounded-full" />
-                  <div>
-                    <p className="text-sm font-medium">{DemoUser.name}</p>
-                    <p className="text-xs text-muted-foreground">{DemoUser.email}</p>
+
+              {/* User Profile - Mobile */}
+              <div className="px-4 py-4 border-b border-gray-200 dark:border-gray-700">
+                <div className="flex items-center gap-3">
+                  <img
+                    src={DemoUser.avatar}
+                    alt={DemoUser.name}
+                    className="w-10 h-10 rounded-full object-cover border border-gray-200 dark:border-gray-700"
+                  />
+                  <div className="flex-1">
+                    <h3 className="font-medium text-gray-900 dark:text-white">{DemoUser.name}</h3>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">{DemoUser.email}</p>
                   </div>
                 </div>
               </div>
-              
-              <div className="flex-1 overflow-auto">
-                <nav className="px-2 py-4">
-                  <ul className="space-y-2">
-                    <li>
-                      <Link
-                        href="/dashboard"
-                        className="flex items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground"
-                        onClick={() => setIsOpen(false)}
-                      >
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          strokeWidth={1.5}
-                          stroke="currentColor"
-                          className="w-5 h-5"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25"
-                          />
-                        </svg>
-                        Dashboard
-                      </Link>
-                    </li>
-                    <li>
-                      <Link
-                        href="/dashboard/models"
-                        className="flex items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground"
-                        onClick={() => setIsOpen(false)}
-                      >
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          strokeWidth={1.5}
-                          stroke="currentColor"
-                          className="w-5 h-5"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z"
-                          />
-                        </svg>
-                        Models
-                      </Link>
-                    </li>
-                    <li>
-                      <Link
-                        href="/dashboard/products"
-                        className="flex items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground"
-                        onClick={() => setIsOpen(false)}
-                      >
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          strokeWidth={1.5}
-                          stroke="currentColor"
-                          className="w-5 h-5"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z"
-                          />
-                        </svg>
-                        Products
-                      </Link>
-                    </li>
-                    <li>
-                      <Link
-                        href="/dashboard/collections"
-                        className="flex items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground"
-                        onClick={() => setIsOpen(false)}
-                      >
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          strokeWidth={1.5}
-                          stroke="currentColor"
-                          className="w-5 h-5"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            d="M2.25 12.75V12A2.25 2.25 0 014.5 9.75h15A2.25 2.25 0 0121.75 12v.75m-8.69-6.44l-2.12-2.12a1.5 1.5 0 00-1.061-.44H4.5A2.25 2.25 0 002.25 6v12a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9a2.25 2.25 0 00-2.25-2.25h-5.379a1.5 1.5 0 01-1.06-.44z"
-                          />
-                        </svg>
-                        Collections
-                      </Link>
-                    </li>
-                  </ul>
-                </nav>
+
+              {/* Search - Mobile */}
+              <div className="px-4 py-4">
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                  <input
+                    type="text"
+                    placeholder="Search..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-full pl-10 pr-4 py-2 text-sm border-0 bg-gray-100 dark:bg-gray-700 rounded-lg focus:ring-2 focus:ring-primary/50"
+                  />
+                </div>
               </div>
-              
-              <div className="p-4">
-                <Link
-                  href="/"
-                  className="flex items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium transition-colors text-muted-foreground hover:bg-accent hover:text-accent-foreground"
-                  onClick={() => setIsOpen(false)}
+
+              {/* Navigation */}
+              <div className="flex-1 overflow-y-auto py-2 px-3 space-y-6">
+                {navigationItems.map((section, i) => (
+                  <motion.div key={i} variants={menuItemVariants}>
+                    <h3 className="px-3 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">
+                      {section.title}
+                    </h3>
+                    <div className="space-y-1">
+                      {section.links.map((link, j) => {
+                        const isActive = pathname === link.href;
+                        return (
+                          <motion.div key={j} variants={menuItemVariants}>
+                            <Link
+                              href={link.href}
+                              onClick={closeSidebar}
+                              className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium ${
+                                isActive
+                                  ? "bg-primary/10 text-primary"
+                                  : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                              }`}
+                            >
+                              <span className={isActive ? "text-primary" : "text-gray-500 dark:text-gray-400"}>
+                                {link.icon}
+                              </span>
+                              <span>{link.name}</span>
+                            </Link>
+                          </motion.div>
+                        );
+                      })}
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+
+              {/* Footer with Logout Button */}
+              <div className="px-4 py-4 border-t border-gray-200 dark:border-gray-700">
+                <button
+                  onClick={closeSidebar}
+                  className="flex items-center w-full gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/10"
                 >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    strokeWidth={1.5}
-                    stroke="currentColor"
-                    className="w-5 h-5"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M9 15L3 9m0 0l6-6M3 9h12a6 6 0 010 12h-3"
-                    />
-                  </svg>
-                  Back to Home
-                </Link>
+                  <LogOut className="w-5 h-5" />
+                  <span>Log out</span>
+                </button>
               </div>
-            </div>
-          </div>
-          
-          <div 
-            className="fixed inset-0 z-40 bg-zinc-950/40" 
-            onClick={() => setIsOpen(false)}
-          ></div>
-        </div>
-      )}
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
     </>
   );
 } 

@@ -7,6 +7,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { Providers } from "./providers";
 import "./globals.css";
 import { usePathname } from "next/navigation";
+import Head from "next/head";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -28,9 +29,9 @@ export default function RootLayout({
 
   return (
     <html lang="en" suppressHydrationWarning>
-      {/* <head>
-        <Script src="https://unpkg.com/react-scan/dist/auto.global.js" />
-      </head> */}
+      <head>
+        <title>{siteConfig.name} - {siteConfig.description}</title>
+      </head>
 
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased font-sans bg-background`}
