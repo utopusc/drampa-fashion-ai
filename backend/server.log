@@ -1,0 +1,18 @@
+(node:58338) [MONGODB DRIVER] Warning: useNewUrlParser is a deprecated option: useNewUrlParser has no effect since Node.js Driver version 4.0.0 and will be removed in the next major version
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:58338) [MONGODB DRIVER] Warning: useUnifiedTopology is a deprecated option: useUnifiedTopology has no effect since Node.js Driver version 4.0.0 and will be removed in the next major version
+(node:58338) [MONGOOSE] Warning: Duplicate schema index on {"email":1} found. This is often due to declaring an index using both "index: true" and "schema.index()". Please remove the duplicate index definition.
+
+🚀 DRAMPA Backend Server Running
+📍 Port: 5001
+🌍 Environment: development
+📊 Database: mongodb://localhost:27017/drampa_db
+⏰ Started at: 5/24/2025, 2:08:14 PM
+  
+MongoDB Connected: localhost
+[0mGET /health [32m200[0m 1.734 ms - 118[0m
+[0mPOST /api/auth/register [32m201[0m 220.000 ms - 381[0m
+[0mPOST /api/auth/login [32m200[0m 208.600 ms - 381[0m
+[0mGET /api/auth/me [32m200[0m 4.051 ms - 199[0m
+[0mPOST /api/auth/login [33m401[0m 208.875 ms - 57[0m
+[0mPOST /api/auth/register [33m400[0m 0.701 ms - 820[0m
