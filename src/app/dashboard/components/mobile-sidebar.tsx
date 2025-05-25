@@ -4,7 +4,8 @@ import { useState } from "react";
 import Link from "next/link";
 import { AnimatePresence, motion } from "motion/react";
 import { Menu, X, LayoutDashboard, BarChart3, ShoppingBag, Users, FolderKanban, Settings, MessageSquare, HelpCircle, LogOut, Search } from "lucide-react";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { useAuth } from "@/contexts/AuthContext";
 
 // Animation variants
 const overlayVariants = {
@@ -100,17 +101,12 @@ const navigationItems = [
   },
 ];
 
-const DemoUser = {
-  name: "Demo Kullanıcı",
-  email: "demo@drampa.app",
-  avatar: "https://ui-avatars.com/api/?name=Demo+Kullanıcı&background=FF7722&color=fff",
-  role: "Free Plan"
-};
-
 export default function MobileSidebar() {
   const [isOpen, setIsOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const pathname = usePathname();
+  const router = useRouter();
+  const { user, logout } = useAuth();
 
   const toggleSidebar = () => {
     setIsOpen(!isOpen);
@@ -119,6 +115,19 @@ export default function MobileSidebar() {
   const closeSidebar = () => {
     setIsOpen(false);
   };
+
+  const handleLogout = () => {
+    logout();
+    closeSidebar();
+    router.push("/");
+  };
+
+  if (!user) {
+    return null;
+  }
+
+  // Generate avatar URL
+  const avatarUrl = user.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&background=FF7722&color=fff`;
 
   return (
     <>
@@ -161,27 +170,28 @@ export default function MobileSidebar() {
                   <span className="text-lg font-bold text-gray-900 dark:text-white">
                     DRAMPA
                   </span>
-                </Link>
-                <button
+                  </Link>
+                  <button
                   onClick={closeSidebar}
                   className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
                   aria-label="Close menu"
-                >
+                  >
                   <X className="w-5 h-5 text-gray-700 dark:text-gray-300" />
-                </button>
-              </div>
+                  </button>
+                </div>
 
               {/* User Profile - Mobile */}
               <div className="px-4 py-4 border-b border-gray-200 dark:border-gray-700">
                 <div className="flex items-center gap-3">
                   <img
-                    src={DemoUser.avatar}
-                    alt={DemoUser.name}
+                    src={avatarUrl}
+                    alt={user.name}
                     className="w-10 h-10 rounded-full object-cover border border-gray-200 dark:border-gray-700"
                   />
                   <div className="flex-1">
-                    <h3 className="font-medium text-gray-900 dark:text-white">{DemoUser.name}</h3>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">{DemoUser.email}</p>
+                    <h3 className="font-medium text-gray-900 dark:text-white">{user.name}</h3>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">{user.email}</p>
+                    <p className="text-xs text-primary font-medium mt-1">{user.plan} Plan</p>
                   </div>
                 </div>
               </div>
@@ -212,7 +222,7 @@ export default function MobileSidebar() {
                         const isActive = pathname === link.href;
                         return (
                           <motion.div key={j} variants={menuItemVariants}>
-                            <Link
+                      <Link
                               href={link.href}
                               onClick={closeSidebar}
                               className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium ${
@@ -220,28 +230,28 @@ export default function MobileSidebar() {
                                   ? "bg-primary/10 text-primary"
                                   : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
                               }`}
-                            >
+                      >
                               <span className={isActive ? "text-primary" : "text-gray-500 dark:text-gray-400"}>
                                 {link.icon}
-                              </span>
+                        </span>
                               <span>{link.name}</span>
-                            </Link>
+                      </Link>
                           </motion.div>
                         );
                       })}
                     </div>
-                  </motion.div>
-                ))}
-              </div>
+                    </motion.div>
+                  ))}
+                </div>
 
               {/* Footer with Logout Button */}
               <div className="px-4 py-4 border-t border-gray-200 dark:border-gray-700">
                 <button
-                  onClick={closeSidebar}
+                  onClick={handleLogout}
                   className="flex items-center w-full gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/10"
                 >
                   <LogOut className="w-5 h-5" />
-                  <span>Log out</span>
+                  <span>Çıkış Yap</span>
                 </button>
               </div>
             </motion.div>

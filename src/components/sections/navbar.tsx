@@ -9,6 +9,7 @@ import { Menu, X } from "lucide-react";
 import { AnimatePresence, motion, useScroll } from "motion/react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { useAuth } from "@/contexts/AuthContext";
 
 const INITIAL_WIDTH = "70rem";
 const MAX_WIDTH = "800px";
@@ -52,6 +53,7 @@ const drawerMenuVariants = {
 
 export function Navbar() {
   const { scrollY } = useScroll();
+  const { user } = useAuth();
   const [hasScrolled, setHasScrolled] = useState(false);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [activeSection, setActiveSection] = useState("hero");
@@ -111,9 +113,8 @@ export function Navbar() {
           )}
         >
           <div className="flex h-[56px] items-center justify-between p-4">
-            <Link href="/" className="flex items-center gap-3">
-              <Icons.logo className="size-7 md:size-10" />
-              <p className="text-lg font-semibold text-primary">Drampa</p>
+            <Link href="/" className="flex items-center space-x-2">
+              <span className="text-xl font-bold text-foreground">DRAMPA</span>
             </Link>
 
             <NavMenu />
@@ -121,12 +122,29 @@ export function Navbar() {
             <div className="flex flex-row items-center gap-1 md:gap-3 shrink-0">
               <ThemeToggle />
               <div className="flex items-center space-x-6">
-                <Link
-                  className="bg-secondary h-8 hidden md:flex items-center justify-center text-sm font-normal tracking-wide rounded-full text-primary-foreground dark:text-secondary-foreground w-fit px-4 shadow-[inset_0_1px_2px_rgba(255,255,255,0.25),0_3px_3px_-1.5px_rgba(16,24,40,0.06),0_1px_1px_rgba(16,24,40,0.08)] border border-white/[0.12]"
-                  href="#"
-                >
-                  Try for free
-                </Link>
+                {user ? (
+                  <Link
+                    className="bg-primary text-primary-foreground h-8 flex items-center justify-center text-sm font-medium tracking-wide rounded-full px-6 shadow-lg hover:shadow-xl transition-all"
+                    href="/dashboard"
+                  >
+                    Go to Dashboard
+                  </Link>
+                ) : (
+                  <>
+                    <Link
+                      className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors px-4 py-2 rounded-lg hover:bg-muted/50"
+                      href="/auth/sign-in"
+                    >
+                      Sign In
+                    </Link>
+                    <Link
+                      className="bg-primary text-primary-foreground h-8 hidden md:flex items-center justify-center text-sm font-medium tracking-wide rounded-full px-6 shadow-lg hover:shadow-xl transition-all"
+                      href="/auth/sign-up"
+                    >
+                      Get Started
+                    </Link>
+                  </>
+                )}
               </div>
               <button
                 className="md:hidden size-8 rounded-md cursor-pointer flex items-center justify-center"
@@ -167,11 +185,8 @@ export function Navbar() {
               {/* Mobile menu content */}
               <div className="flex flex-col gap-4">
                 <div className="flex items-center justify-between">
-                  <Link href="/" className="flex items-center gap-3">
-                    <Icons.logo className="size-7 md:size-10" />
-                    <p className="text-lg font-semibold text-primary">
-                      Drampa
-                    </p>
+                  <Link href="/" className="flex items-center space-x-2">
+                    <span className="text-xl font-bold text-foreground">DRAMPA</span>
                   </Link>
                   <button
                     onClick={toggleDrawer}
@@ -199,14 +214,22 @@ export function Navbar() {
                             const element = document.getElementById(
                               item.href.substring(1),
                             );
-                            element?.scrollIntoView({ behavior: "smooth" });
-                            setIsDrawerOpen(false);
+                            if (element) {
+                              element.scrollIntoView({
+                                behavior: "smooth",
+                                block: "start",
+                                inline: "nearest",
+                              });
+                              setIsDrawerOpen(false);
+                            }
                           }}
-                          className={`underline-offset-4 hover:text-primary/80 transition-colors ${
-                            activeSection === item.href.substring(1)
-                              ? "text-primary font-medium"
-                              : "text-primary/60"
-                          }`}
+                          className={cn(
+                            "text-muted-foreground hover:text-foreground transition-colors rounded-md p-2 block",
+                            {
+                              "text-foreground bg-muted":
+                                activeSection === item.href.substring(1),
+                            },
+                          )}
                         >
                           {item.name}
                         </a>
@@ -215,18 +238,32 @@ export function Navbar() {
                   </AnimatePresence>
                 </motion.ul>
 
-                {/* Action buttons */}
-                <div className="flex flex-col gap-2">
-                  <div className="flex justify-center mb-2">
-                    <ThemeToggle />
-                  </div>
+                {user ? (
                   <Link
-                    href="#"
-                    className="bg-secondary h-8 flex items-center justify-center text-sm font-normal tracking-wide rounded-full text-primary-foreground dark:text-secondary-foreground w-full px-4 shadow-[inset_0_1px_2px_rgba(255,255,255,0.25),0_3px_3px_-1.5px_rgba(16,24,40,0.06),0_1px_1px_rgba(16,24,40,0.08)] border border-white/[0.12] hover:bg-secondary/80 transition-all ease-out active:scale-95"
+                    href="/dashboard"
+                    className="bg-primary text-primary-foreground text-center py-3 px-6 rounded-lg font-medium"
+                    onClick={() => setIsDrawerOpen(false)}
                   >
-                    Try for free
+                    Go to Dashboard
                   </Link>
-                </div>
+                ) : (
+                  <div className="flex flex-col gap-2">
+                    <Link
+                      href="/auth/sign-in"
+                      className="text-center py-3 px-6 rounded-lg font-medium border border-border"
+                      onClick={() => setIsDrawerOpen(false)}
+                    >
+                      Sign In
+                    </Link>
+                    <Link
+                      href="/auth/sign-up"
+                      className="bg-primary text-primary-foreground text-center py-3 px-6 rounded-lg font-medium"
+                      onClick={() => setIsDrawerOpen(false)}
+                    >
+                      Get Started
+                    </Link>
+                  </div>
+                )}
               </div>
             </motion.div>
           </>

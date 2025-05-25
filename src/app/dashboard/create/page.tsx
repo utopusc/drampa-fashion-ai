@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useState, useRef } from "react";
 import { motion } from "motion/react";
+import Navbar from "@/components/ui/navbar";
 
 // Option card data structure
 interface OptionCardProps {
@@ -30,7 +31,7 @@ const CreatePage = () => {
       id: "flat-lay",
       title: "Flat-Lay Photos",
       description: "Start with a simple flat-lay photo of your product. Easily create professional on-model images.",
-      badge: "Beta Feature",
+      badge: "Beta",
       imageSrc: "/assets/flat-lay-thumb.jpg",
       videoSrc: "/assets/flat-lay-video.mp4",
       href: "/dashboard/create/flat-lay"
@@ -39,68 +40,98 @@ const CreatePage = () => {
       id: "mannequin",
       title: "Mannequin Photos",
       description: "Start with a simple mannequin photo of your product. Easily create professional on-model images.",
-      badge: "Beta Feature",
+      badge: "Beta",
       imageSrc: "/assets/mannequin-thumb.jpg",
       href: "/dashboard/create/mannequin"
     }
   ];
 
   return (
-    <div className="space-y-6">
-      <div className="space-y-2">
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">Let's get started</h1>
-        <p className="text-lg text-gray-600 dark:text-gray-400">
-          Simply choose the type of photo you want to upload: an on-model photo, a flat-lay, or a mannequin photo.
-        </p>
-      </div>
+    <div className="min-h-screen bg-background">
+      <Navbar />
+      
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        {/* Header */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          className="text-center mb-16"
+        >
+          <h1 className="text-5xl font-bold text-foreground mb-6">Let's get started</h1>
+          <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
+            Simply choose the type of photo you want to upload: an on-model photo, a flat-lay, or a mannequin photo.
+          </p>
+        </motion.div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-5 md:gap-6 mt-8 w-full">
-        {options.map((option) => (
-          <OptionCard key={option.id} {...option} />
-        ))}
+        {/* Options Grid */}
+        <motion.div
+          initial={{ opacity: 0, y: 40 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.2 }}
+          className="grid grid-cols-1 md:grid-cols-3 gap-8"
+        >
+          {options.map((option, index) => (
+            <OptionCard key={option.id} option={option} index={index} />
+          ))}
+        </motion.div>
       </div>
     </div>
   );
 };
 
-const OptionCard = ({ id, title, description, badge, imageSrc, videoSrc, href }: OptionCardProps) => {
+// Individual Option Card Component
+interface OptionCardComponentProps {
+  option: OptionCardProps;
+  index: number;
+}
+
+const OptionCard = ({ option, index }: OptionCardComponentProps) => {
   const [isHovered, setIsHovered] = useState(false);
   const [imageError, setImageError] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
 
   const handleMouseEnter = () => {
     setIsHovered(true);
-    if (videoRef.current && videoSrc) {
+    if (videoRef.current && option.videoSrc) {
       videoRef.current.play().catch(error => console.error("Video play error:", error));
     }
   };
 
   const handleMouseLeave = () => {
     setIsHovered(false);
-    if (videoRef.current && videoSrc) {
+    if (videoRef.current && option.videoSrc) {
       videoRef.current.pause();
       videoRef.current.currentTime = 0;
     }
   };
 
   const handleImageError = () => {
-    console.error(`Failed to load image: ${imageSrc}`);
+    console.error(`Failed to load image: ${option.imageSrc}`);
     setImageError(true);
+  };
+
+  // Helper function to get the appropriate badge colors
+  const getBadgeStyles = (badge: string) => {
+    if (badge === "Highest Quality") {
+      return "bg-purple-100 text-purple-700 border-purple-200 dark:bg-purple-900/30 dark:text-purple-300 dark:border-purple-700";
+    }
+    return "bg-blue-100 text-blue-700 border-blue-200 dark:bg-blue-900/30 dark:text-blue-300 dark:border-blue-700";
   };
 
   const iconMap = {
     "on-model": (
-      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-12 h-12">
         <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
       </svg>
     ),
     "flat-lay": (
-      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-12 h-12">
         <path strokeLinecap="round" strokeLinejoin="round" d="M6.429 9.75 2.25 12l4.179 2.25m0-4.5 5.571 3 5.571-3m-11.142 0L2.25 7.5 12 2.25l9.75 5.25-4.179 2.25m0 0L21.75 12l-4.179 2.25m0 0 4.179 2.25L12 21.75 2.25 16.5l4.179-2.25m11.142 0-5.571 3-5.571-3" />
       </svg>
     ),
     "mannequin": (
-      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-12 h-12">
         <path strokeLinecap="round" strokeLinejoin="round" d="M9.568 3H5.25A2.25 2.25 0 0 0 3 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 0 0 5.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 0 0 9.568 3Z" />
         <path strokeLinecap="round" strokeLinejoin="round" d="M6 6h.008v.008H6V6Z" />
       </svg>
@@ -108,82 +139,94 @@ const OptionCard = ({ id, title, description, badge, imageSrc, videoSrc, href }:
   };
 
   return (
-    <motion.div 
-      className="bg-white dark:bg-[#1a1a1a] rounded-xl shadow-md overflow-hidden border border-gray-100 dark:border-gray-800 hover:shadow-lg transition-all"
-      whileHover={{ y: -5 }}
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
+    <motion.div
+      initial={{ opacity: 0, y: 30 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6, delay: index * 0.1 }}
+      className="group"
     >
-      <div className="relative aspect-[16/9] bg-gray-100 dark:bg-gray-800 overflow-hidden">
-        {videoSrc ? (
-          <>
-            {!imageError ? (
-              <img 
-                src={imageSrc} 
-                alt={title} 
-                onError={handleImageError}
-                className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-300 ${isHovered ? 'opacity-0' : 'opacity-100'}`}
-              />
-            ) : (
-              <div className={`absolute inset-0 w-full h-full flex items-center justify-center bg-[#FFF0E6] dark:bg-[#331400] transition-opacity duration-300 ${isHovered ? 'opacity-0' : 'opacity-100'}`}>
-                <span className="text-[#FF7722] text-lg font-medium">{title}</span>
-              </div>
-            )}
-            <video 
-              ref={videoRef}
-              className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-300 ${isHovered ? 'opacity-100' : 'opacity-0'}`}
-              loop
-              muted
-              playsInline
-            >
-              <source src={videoSrc} type="video/mp4" />
-              <source src={videoSrc.replace('.mp4', '.webm')} type="video/webm" />
-              Your browser does not support the video tag.
-            </video>
-          </>
-        ) : (
-          <>
-            {!imageError ? (
-              <img 
-                src={imageSrc} 
-                alt={title} 
-                onError={handleImageError}
-                className="w-full h-full object-cover" 
-              />
-            ) : (
-              <div className="w-full h-full flex items-center justify-center bg-[#FFF0E6] dark:bg-[#331400]">
-                <span className="text-[#FF7722] text-lg font-medium">{title}</span>
-              </div>
-            )}
-          </>
-        )}
-      </div>
+      <Link href={option.href}>
+        <motion.div 
+          className="bg-card rounded-2xl shadow-lg overflow-hidden border border-border hover:shadow-xl transition-all cursor-pointer h-full hover:border-primary/20"
+          whileHover={{ y: -8, scale: 1.02 }}
+          transition={{ duration: 0.3 }}
+          onMouseEnter={handleMouseEnter}
+          onMouseLeave={handleMouseLeave}
+        >
+          {/* Visual Preview Section - Single Large Image */}
+          <div className="relative h-80 bg-gradient-to-br from-muted/50 to-muted overflow-hidden">
+            {/* Badge */}
+            <div className="absolute top-6 left-6 z-10">
+              <span className={`inline-flex items-center px-4 py-2 rounded-full text-sm font-medium border ${getBadgeStyles(option.badge)}`}>
+                {option.badge}
+              </span>
+            </div>
 
-      <div className="p-5 space-y-4">
-        <div className="flex flex-col gap-2">
-          <div className="flex items-center">
-            <span className="bg-[#FFF0E6] dark:bg-[#331400] text-[#FF7722] text-xs font-medium px-2.5 py-1 rounded-full">
-              {badge}
-            </span>
+            {/* Main Image/Video Container */}
+            <div className="relative h-full w-full">
+              {/* Static Image */}
+              {!imageError ? (
+                <img 
+                  src={option.imageSrc} 
+                  alt={option.title}
+                  onError={handleImageError}
+                  className={`w-full h-full object-cover transition-opacity duration-500 ${isHovered && option.videoSrc ? 'opacity-0' : 'opacity-100'}`}
+                />
+              ) : (
+                <div className={`w-full h-full flex items-center justify-center bg-muted transition-opacity duration-500 ${isHovered && option.videoSrc ? 'opacity-0' : 'opacity-100'}`}>
+                  <div className="text-muted-foreground">
+                    {iconMap[option.id as keyof typeof iconMap]}
+                  </div>
+                </div>
+              )}
+
+              {/* Video Overlay */}
+              {option.videoSrc && (
+                <video 
+                  ref={videoRef}
+                  className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-500 ${isHovered ? 'opacity-100' : 'opacity-0'}`}
+                  loop
+                  muted
+                  playsInline
+                >
+                  <source src={option.videoSrc} type="video/mp4" />
+                  Your browser does not support the video tag.
+                </video>
+              )}
+
+              {/* Overlay gradient for better text readability */}
+              <div className="absolute inset-0 bg-gradient-to-t from-background/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+            </div>
           </div>
-          <div className="flex items-center gap-2 mt-1">
-            <span className="bg-[#FFF0E6] dark:bg-[#331400] p-2 rounded-md text-[#FF7722]">
-              {iconMap[id as keyof typeof iconMap]}
-            </span>
-            <h3 className="text-xl font-semibold text-gray-900 dark:text-white">{title}</h3>
+
+          {/* Content Section */}
+          <div className="p-8 space-y-6">
+            <div className="flex flex-col gap-4">
+              <div className="flex items-center gap-4">
+                <span className="bg-muted p-3 rounded-xl text-muted-foreground group-hover:bg-primary group-hover:text-primary-foreground transition-colors duration-300">
+                  {iconMap[option.id as keyof typeof iconMap]}
+                </span>
+                <h3 className="text-2xl font-bold text-foreground group-hover:text-primary transition-colors">
+                  {option.title}
+                </h3>
+              </div>
+              <p className="text-muted-foreground leading-relaxed text-base">
+                {option.description}
+              </p>
+            </div>
+            
+            <motion.button 
+              className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-semibold py-4 px-6 rounded-xl transition-all flex items-center justify-center gap-3 group-hover:shadow-lg transform group-hover:scale-105 duration-300"
+              whileTap={{ scale: 0.95 }}
+            >
+              Start Creating
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5 group-hover:translate-x-1 transition-transform">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
+              </svg>
+            </motion.button>
           </div>
-          <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">{description}</p>
-        </div>
-        
-        <Link href={href} className="block mt-2">
-          <button className="w-full bg-[#FF7722] hover:bg-[#E65100] text-white font-medium py-2.5 px-5 rounded-lg transition-colors flex items-center justify-center gap-2">
-            Start Creating
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
-            </svg>
-          </button>
-        </Link>
-      </div>
+        </motion.div>
+      </Link>
     </motion.div>
   );
 };

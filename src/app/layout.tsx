@@ -3,20 +3,16 @@
 import { Navbar } from "@/components/sections/navbar";
 import { siteConfig } from "@/lib/config";
 import { metadata, viewport } from "./metadata";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Outfit } from "next/font/google";
 import { Providers } from "./providers";
 import "./globals.css";
 import { usePathname } from "next/navigation";
 import Head from "next/head";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const outfit = Outfit({
+  variable: "--font-outfit",
   subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700", "800", "900"],
 });
 
 export default function RootLayout({
@@ -30,11 +26,11 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-        <title>{siteConfig.name} - {siteConfig.description}</title>
+        <title>{`${siteConfig.name} - ${siteConfig.description}`}</title>
       </head>
 
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased font-sans bg-background`}
+        className={`${outfit.variable} antialiased font-sans bg-background`}
       >
         <Providers>
           <div className="max-w-7xl mx-auto relative">
