@@ -1,9 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { motion } from "motion/react";
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import { AuroraText } from "@/components/magicui/aurora-text";
 import { 
@@ -29,7 +29,6 @@ interface GeneratedImage {
 const ResultsPage = () => {
   const { user, loading } = useAuth();
   const router = useRouter();
-  const searchParams = useSearchParams();
   
   const [generatedImages, setGeneratedImages] = useState<GeneratedImage[]>([]);
   const [isGenerating, setIsGenerating] = useState(true);
@@ -444,4 +443,20 @@ const ResultsPage = () => {
   );
 };
 
-export default ResultsPage; 
+// Wrapper component with Suspense
+const ResultsPageWrapper = () => {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary mx-auto"></div>
+          <p className="mt-4 text-muted-foreground">Loading...</p>
+        </div>
+      </div>
+    }>
+      <ResultsPage />
+    </Suspense>
+  );
+};
+
+export default ResultsPageWrapper; 
