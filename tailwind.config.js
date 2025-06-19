@@ -96,6 +96,28 @@ module.exports = {
             transform: "translate(calc(100cqw - 100%), 0)",
           },
         },
+        aurora: {
+          "0%": {
+            backgroundPosition: "0% 50%",
+            transform: "rotate(-2deg) scale(1)",
+          },
+          "25%": {
+            backgroundPosition: "100% 50%",
+            transform: "rotate(2deg) scale(1.02)",
+          },
+          "50%": {
+            backgroundPosition: "0% 100%",
+            transform: "rotate(-1deg) scale(0.98)",
+          },
+          "75%": {
+            backgroundPosition: "100% 0%",
+            transform: "rotate(1deg) scale(1.01)",
+          },
+          "100%": {
+            backgroundPosition: "0% 50%",
+            transform: "rotate(-2deg) scale(1)",
+          },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
@@ -103,6 +125,7 @@ module.exports = {
         shimmer: "shimmer 2s linear infinite",
         "spin-around": "spin-around calc(var(--speed) * 2) infinite linear",
         slide: "slide var(--speed) ease-in-out infinite alternate",
+        aurora: "aurora 8s ease-in-out infinite alternate",
       },
     },
   },

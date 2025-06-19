@@ -1,6 +1,5 @@
 "use client";
 
-import { Icons } from "@/components/icons";
 import { NavMenu } from "@/components/nav-menu";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { siteConfig } from "@/lib/config";
@@ -137,12 +136,12 @@ export function Navbar() {
                     >
                       Sign In
                     </Link>
-                    <Link
+                <Link
                       className="bg-primary text-primary-foreground h-8 hidden md:flex items-center justify-center text-sm font-medium tracking-wide rounded-full px-6 shadow-lg hover:shadow-xl transition-all"
                       href="/auth/sign-up"
-                    >
+                >
                       Get Started
-                    </Link>
+                </Link>
                   </>
                 )}
               </div>
@@ -220,7 +219,7 @@ export function Navbar() {
                                 block: "start",
                                 inline: "nearest",
                               });
-                              setIsDrawerOpen(false);
+                            setIsDrawerOpen(false);
                             }
                           }}
                           className={cn(
@@ -261,8 +260,8 @@ export function Navbar() {
                       onClick={() => setIsDrawerOpen(false)}
                     >
                       Get Started
-                    </Link>
-                  </div>
+                  </Link>
+                </div>
                 )}
               </div>
             </motion.div>

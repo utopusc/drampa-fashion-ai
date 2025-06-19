@@ -59,7 +59,8 @@
   --exitToRight: exitToRight 250ms ease;
   --animate-elliptical-orbit: elliptical-orbit 20s linear infinite;
   --animate-meteor: meteor linear;
-  
+  --animate-aurora: aurora 8s ease-in-out infinite alternate;
+
   @keyframes orbit {
     0% {
       transform: rotate(calc(var(--angle) * 1deg))
@@ -209,7 +210,7 @@
       opacity: 0;
     }
   }
-  
+
   @keyframes meteor {
     0% {
       transform: rotate(215deg) translateX(0);
@@ -233,6 +234,29 @@
     }
     100% {
       transform: translateX(-50%) rotate(360deg) translateY(-50%) rotate(-360deg);
+    }
+  }
+
+  @keyframes aurora {
+    0% {
+      background-position: 0% 50%;
+      transform: rotate(-2deg) scale(1);
+    }
+    25% {
+      background-position: 100% 50%;
+      transform: rotate(2deg) scale(1.02);
+    }
+    50% {
+      background-position: 0% 100%;
+      transform: rotate(-1deg) scale(0.98);
+    }
+    75% {
+      background-position: 100% 0%;
+      transform: rotate(1deg) scale(1.01);
+    }
+    100% {
+      background-position: 0% 50%;
+      transform: rotate(-2deg) scale(1);
     }
   }
 }

@@ -7,6 +7,7 @@ import { motion } from "framer-motion";
 import { Plus, Search, User, Settings, LogOut, ChevronDown, Menu, X } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { AuroraText } from "@/components/magicui/aurora-text";
 
 export default function Navbar() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -17,9 +18,8 @@ export default function Navbar() {
   const { user, logout } = useAuth();
 
   const navigation = [
-    { name: "Projects", href: "/dashboard" },
-    { name: "Create", href: "/dashboard/create" },
-    { name: "Gallery", href: "/gallery" },
+    { name: "Home", href: "/dashboard" },
+    { name: "Gallery", href: "/dashboard/gallery" },
     { name: "Pricing", href: "/pricing" },
   ];
 
@@ -63,7 +63,11 @@ export default function Navbar() {
                 whileHover={{ scale: 1.05 }}
                 transition={{ duration: 0.2 }}
               >
-                <span className="text-xl font-bold text-foreground tracking-tight">DRAMPA</span>
+                <span className="text-xl font-bold text-foreground tracking-tight">
+                  <AuroraText colors={["#FF7722", "#FF9933", "#FFB366", "#FFC999"]} speed={0.8}>
+                    DRAMPA
+                  </AuroraText>
+                </span>
               </motion.div>
             </Link>
 
@@ -112,14 +116,18 @@ export default function Navbar() {
               <ThemeToggle />
 
               {/* Create Button */}
-              <Link href="/dashboard/create">
+              <Link href="/create">
                 <motion.button
                   className="bg-primary hover:bg-primary/90 text-primary-foreground font-medium text-sm rounded-xl px-4 py-2.5 flex items-center gap-2 transition-all shadow-sm hover:shadow-md"
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                 >
                   <Plus className="w-4 h-4" />
-                  <span className="hidden sm:inline">Create</span>
+                  <span className="hidden sm:inline">
+                    <AuroraText colors={["#FFFFFF", "#FFF5F0", "#FFFFFF", "#FFE5D9"]} speed={1.0}>
+                      Create
+                    </AuroraText>
+                  </span>
                 </motion.button>
               </Link>
 

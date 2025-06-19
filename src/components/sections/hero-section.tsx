@@ -1,164 +1,353 @@
 "use client";
 
 import { siteConfig } from "@/lib/config";
-import Link from "next/link";
 import { DotPattern } from "@/components/ui/dot-pattern";
-import { FileUpload } from "@/components/ui/file-upload";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
-import { User, LogIn } from "lucide-react";
+import { LogIn, Sparkles, ArrowRight } from "lucide-react";
+import { motion, useAnimation, useInView, cubicBezier } from "motion/react";
+import { AuroraText } from "@/components/magicui/aurora-text";
+
+// Professional fashion photos from gallery
+const fashionGallery = [
+  {
+    id: 1,
+    image: "/assets/gallery/ydAiEgEy97IirXF66ych-7wP4ZQ.webp",
+  },
+  {
+    id: 2,
+    image: "/assets/gallery/XRGSA2yky9adhJCqjUkvbA.jpg",
+  },
+  {
+    id: 3,
+    image: "/assets/gallery/ydAiEgEy97IirXF66ych-IjG78g.webp",
+  },
+  {
+    id: 4,
+    image: "/assets/gallery/ET-_xFCkTao8MG6LM2-_yw.jpg",
+  },
+  {
+    id: 5,
+    image: "/assets/gallery/ydAiEgEy97IirXF66ych-Lq6aIw.webp",
+  },
+  {
+    id: 6,
+    image: "/assets/gallery/B2YFCT20auU886jEj4Jjfw.jpg",
+  },
+  {
+    id: 7,
+    image: "/assets/gallery/uMlilk9A0v2BAe9Y9tJMNQ.jpg",
+  },
+  {
+    id: 8,
+    image: "/assets/gallery/QvqQtqjMCCUe7S75KOuVPg.jpg",
+  },
+  {
+    id: 9,
+    image: "/assets/gallery/pN3DhKTjkXsIQ5FkCXYJGw.jpg",
+  },
+  {
+    id: 10,
+    image: "/assets/gallery/nSadEGMtG4JTxK_okr7mzw.jpg",
+  },
+  {
+    id: 11,
+    image: "/assets/gallery/S2L90stoJrIuTKo9y-Fg3A.jpg",
+  },
+  {
+    id: 12,
+    image: "/assets/gallery/yyOLRTTdLlW8EbmL03aLnQ.jpg",
+  }
+];
 
 export function HeroSection() {
-  const { hero } = siteConfig;
   const router = useRouter();
-  const [files, setFiles] = useState<File[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
   const { user } = useAuth();
 
-  const handleFileUpload = (newFiles: File[]) => {
-    setFiles(newFiles);
-  };
+  // Orange theme colors for Aurora effect
+  const orangeAuroraColors = ["#FF7722", "#FF9933", "#FFB366", "#FFC999"];
 
-  const handleContinue = () => {
-    if (files.length > 0) {
-      setIsLoading(true);
-      // Set session storage flag to indicate we're coming from the file upload
-      if (typeof window !== 'undefined') {
-        sessionStorage.setItem('productImageUploaded', 'true');
+  // Continuous Sliding Fashion Gallery Component
+  const SlidingFashionGallery = () => {
+    const containerRef = useRef(null);
+    const inView = useInView(containerRef, { amount: 0.25 });
+    const controls = useAnimation();
+
+    useEffect(() => {
+      if (inView) {
+        controls.start("visible");
       }
-      
-      // Simulate processing
-      setTimeout(() => {
-        router.push("/dashboard");
-      }, 1500);
-    }
-  };
+    }, [inView, controls]);
 
-  const AuthRequiredUpload = () => (
-    <div className="relative bg-card/50 dark:bg-card/30 rounded-xl p-8 border border-border shadow-sm backdrop-blur-sm text-center">
-      <div className="mb-6">
-        <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
-          <User className="w-8 h-8 text-primary" />
-        </div>
-        <h2 className="text-xl font-semibold text-foreground mb-2">AI Fashion Transformation</h2>
-        <p className="text-muted-foreground text-sm max-w-md mx-auto">
-          Transform your product images with AI-powered virtual fashion models. Sign in to get started with your fashion visualization journey.
-        </p>
-      </div>
-      
-      <div className="space-y-3">
-        <Link
-          href="/auth/sign-up"
-          className="bg-primary h-12 flex items-center justify-center text-sm font-medium tracking-wide rounded-lg text-primary-foreground px-6 shadow-md border border-primary/10 hover:bg-primary/90 transition-all ease-out w-full"
-        >
-          <User className="w-4 h-4 mr-2" />
-          Create Free Account
-        </Link>
-        
-        <Link
-          href="/auth/sign-in"
-          className="h-12 flex items-center justify-center px-6 text-sm font-medium tracking-wide text-primary rounded-lg transition-all ease-out bg-secondary/30 dark:bg-secondary/20 border border-secondary-foreground/10 hover:bg-secondary/50 dark:hover:bg-secondary/30 w-full"
-        >
-          <LogIn className="w-4 h-4 mr-2" />
-          Sign In
-        </Link>
-        
-        <p className="text-xs text-muted-foreground mt-4">
-          Join thousands of fashion designers creating stunning visualizations
-        </p>
-      </div>
-    </div>
-  );
+    // Triple the array for seamless infinite scroll
+    const tripleGallery = [...fashionGallery, ...fashionGallery, ...fashionGallery];
 
-  const FileUploadComponent = () => (
-    <div className="relative bg-card/50 dark:bg-card/30 rounded-xl p-6 border border-border shadow-sm backdrop-blur-sm">
-      <div className="text-center mb-4">
-        <h2 className="text-xl font-semibold text-foreground">Magic Fashion Transformation</h2>
-        <p className="text-muted-foreground text-sm max-w-md mx-auto mt-1">Drop your product image and watch AI create fashion models wearing it</p>
-      </div>
-      
-      <div className="relative transform transition-all">
-        <FileUpload onChange={handleFileUpload} />
-        
-        <div className="mt-6 text-center">
-          <Button 
-            onClick={handleContinue}
-            disabled={files.length === 0 || isLoading}
-            className="bg-primary h-10 text-sm font-medium rounded-lg text-primary-foreground px-6 shadow-md border border-primary/10 hover:bg-primary/90 transition-all ease-out w-full max-w-xs mx-auto"
+    return (
+      <div className="relative w-full h-full overflow-hidden">
+        {/* Floating badge */}
+        <div className="absolute top-8 left-8 z-20">
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.6, delay: 0.5 }}
+            className="bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm rounded-full px-4 py-2 text-sm font-medium text-foreground shadow-lg border border-primary/20"
           >
-            {isLoading ? (
-              <div className="flex items-center gap-2 justify-center">
-                <svg className="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
-                Processing...
-              </div>
-            ) : (
-              "Transform & Visualize"
-            )}
-          </Button>
-          
-          <p className="text-xs text-muted-foreground mt-3 max-w-xs mx-auto">
-            By uploading your image, you agree to our Terms of Service
-          </p>
+            <Sparkles className="w-4 h-4 inline mr-2 text-primary" />
+            50+ AI Models
+          </motion.div>
+        </div>
+
+        {/* Gradient overlays for fade effect */}
+        <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-32 bg-gradient-to-r from-background to-transparent"></div>
+        <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-32 bg-gradient-to-l from-background to-transparent"></div>
+        <div className="pointer-events-none absolute inset-x-0 top-0 z-10 h-32 bg-gradient-to-b from-background to-transparent"></div>
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-32 bg-gradient-to-t from-background to-transparent"></div>
+        
+        <div
+          ref={containerRef}
+          className="relative grid grid-cols-3 gap-8 p-8 h-full [transform:rotate(-5deg)translateZ(10px)]"
+        >
+          {/* First Column */}
+          <motion.div 
+            className="flex flex-col gap-6"
+            animate={{ y: [0, -200] }}
+            transition={{ 
+              duration: 30, 
+              repeat: Infinity, 
+              ease: "linear",
+              repeatType: "loop"
+            }}
+          >
+            {tripleGallery.slice(0, 9).map((model, index) => (
+              <motion.div
+                key={`col1-${model.id}-${index}`}
+                variants={{
+                  hidden: { opacity: 0, scale: 0.8 },
+                  visible: { opacity: 1, scale: 1 },
+                }}
+                initial="hidden"
+                animate={controls}
+                transition={{
+                  duration: 0.6,
+                  ease: cubicBezier(0.22, 1, 0.36, 1),
+                  delay: index * 0.05,
+                }}
+                className="rounded-2xl border border-white/20 bg-white/10 backdrop-blur-sm shadow-xl hover:scale-105 transition-transform duration-300 overflow-hidden"
+              >
+                <div className="relative w-full h-48 rounded-2xl overflow-hidden">
+                  <img
+                    src={model.image}
+                    alt="Fashion Model"
+                    className="w-full h-full object-cover object-top"
+                  />
+                </div>
+              </motion.div>
+            ))}
+          </motion.div>
+
+          {/* Second Column */}
+          <motion.div 
+            className="flex flex-col gap-6"
+            animate={{ y: [-200, 0] }}
+            transition={{ 
+              duration: 35, 
+              repeat: Infinity, 
+              ease: "linear",
+              repeatType: "loop"
+            }}
+          >
+            {tripleGallery.slice(3, 12).map((model, index) => (
+              <motion.div
+                key={`col2-${model.id}-${index}`}
+                variants={{
+                  hidden: { opacity: 0, scale: 0.8 },
+                  visible: { opacity: 1, scale: 1 },
+                }}
+                initial="hidden"
+                animate={controls}
+                transition={{
+                  duration: 0.6,
+                  ease: cubicBezier(0.22, 1, 0.36, 1),
+                  delay: index * 0.05 + 0.1,
+                }}
+                className="rounded-2xl border border-white/20 bg-white/10 backdrop-blur-sm shadow-xl hover:scale-105 transition-transform duration-300 overflow-hidden"
+              >
+                <div className="relative w-full h-48 rounded-2xl overflow-hidden">
+                  <img
+                    src={model.image}
+                    alt="Fashion Model"
+                    className="w-full h-full object-cover object-top"
+                  />
+                </div>
+              </motion.div>
+            ))}
+          </motion.div>
+
+          {/* Third Column */}
+          <motion.div 
+            className="flex flex-col gap-6"
+            animate={{ y: [0, -200] }}
+            transition={{ 
+              duration: 32, 
+              repeat: Infinity, 
+              ease: "linear",
+              repeatType: "loop"
+            }}
+          >
+            {tripleGallery.slice(6, 15).map((model, index) => (
+              <motion.div
+                key={`col3-${model.id}-${index}`}
+                variants={{
+                  hidden: { opacity: 0, scale: 0.8 },
+                  visible: { opacity: 1, scale: 1 },
+                }}
+                initial="hidden"
+                animate={controls}
+                transition={{
+                  duration: 0.6,
+                  ease: cubicBezier(0.22, 1, 0.36, 1),
+                  delay: index * 0.05 + 0.2,
+                }}
+                className="rounded-2xl border border-white/20 bg-white/10 backdrop-blur-sm shadow-xl hover:scale-105 transition-transform duration-300 overflow-hidden"
+              >
+                <div className="relative w-full h-48 rounded-2xl overflow-hidden">
+                  <img
+                    src={model.image}
+                    alt="Fashion Model"
+                    className="w-full h-full object-cover object-top"
+                  />
+                </div>
+              </motion.div>
+            ))}
+          </motion.div>
+
+
         </div>
       </div>
-    </div>
-  );
+    );
+  };
 
   return (
-    <section id="hero" className="w-full relative overflow-hidden pt-16 pb-16 md:pt-20 md:pb-20 lg:pt-24 lg:pb-24 bg-background">
+    <section id="hero" className="w-full relative overflow-hidden pt-12 pb-12 md:pt-16 md:pb-16 lg:pt-20 lg:pb-20 bg-background min-h-screen flex items-center">
       <div className="absolute inset-0 -z-10">
         <DotPattern 
           width={40}
           height={40}
           cr={4}
           glow={false}
-          className="opacity-80"
+          className="opacity-60"
         />
       </div>
       
-      <div className="relative max-w-7xl mx-auto px-4 sm:px-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-10 lg:gap-16 items-center">
+      {/* Full width container */}
+      <div className="relative w-full px-4 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 items-center min-h-[80vh] max-w-[1400px] mx-auto">
           {/* Left Column: Hero Content */}
-          <div className="flex flex-col gap-5">
+          <motion.div 
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.6 }}
+            className="flex flex-col gap-8 lg:pr-8"
+          >
             <div>
-              <p className="inline-flex h-8 items-center gap-2 rounded-full bg-secondary/30 dark:bg-secondary/20 border border-secondary-foreground/10 px-3 text-sm font-medium text-primary">
-                {hero.badgeIcon}
-                {hero.badge}
-              </p>
+              <motion.p 
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.1 }}
+                className="inline-flex h-8 items-center gap-2 rounded-full bg-primary/10 border border-primary/20 px-3 text-sm font-medium text-primary"
+              >
+                <Sparkles className="w-4 h-4" />
+                AI Fashion Photography Revolution
+              </motion.p>
             </div>
 
-            <div className="space-y-4">
-              <h1 className="text-3xl md:text-4xl font-bold text-foreground">
-                {hero.title}
-              </h1>
-              <p className="text-base text-muted-foreground font-normal leading-relaxed max-w-md">
-                {hero.description}
-              </p>
+            <div className="space-y-6">
+              <motion.h1 
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.2 }}
+                className="text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold text-foreground leading-tight"
+              >
+                Create{" "}
+                <AuroraText colors={orangeAuroraColors} speed={0.6}>
+                  Professional
+                </AuroraText>{" "}
+                Fashion Photos in Minutes
+              </motion.h1>
               
-              <div className="flex items-center gap-4 pt-2">
-                <Link
-                  href={user ? "/dashboard" : "/auth/sign-up"}
-                  className="bg-primary h-10 flex items-center justify-center text-sm font-medium tracking-wide rounded-lg text-primary-foreground px-5 shadow-md border border-primary/10 hover:bg-primary/90 transition-all ease-out"
+              <motion.p 
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.3 }}
+                className="text-lg md:text-xl text-muted-foreground font-normal leading-relaxed max-w-lg"
+              >
+                Transform your fashion products with AI-powered virtual models. 
+                No expensive photoshoots, no complex setup - just stunning results in minutes.
+              </motion.p>
+              
+              <motion.div 
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.4 }}
+                className="flex flex-col sm:flex-row items-start sm:items-center gap-4 pt-2"
+              >
+                <Button 
+                  size="lg"
+                  onClick={() => router.push(user ? "/dashboard" : "/auth/sign-up")}
+                  className="bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-4 text-base font-medium h-12"
                 >
-                  {user ? "Go to Dashboard" : hero.cta.primary.text}
-                </Link>
-                <Link
-                  href={hero.cta.secondary.href}
-                  className="h-10 flex items-center justify-center px-5 text-sm font-medium tracking-wide text-primary rounded-lg transition-all ease-out bg-secondary/30 dark:bg-secondary/20 border border-secondary-foreground/10 hover:bg-secondary/50 dark:hover:bg-secondary/30"
-                >
-                  {hero.cta.secondary.text}
-                </Link>
-              </div>
+                  <Sparkles className="w-5 h-5 mr-2" />
+                  {user ? "Go to Dashboard" : "Start Free Trial"}
+                  <ArrowRight className="w-5 h-5 ml-2" />
+                </Button>
+                
+                {!user && (
+                  <Button 
+                    variant="outline" 
+                    size="lg"
+                    onClick={() => router.push("/auth/sign-in")}
+                    className="px-8 py-4 text-base font-medium h-12"
+                  >
+                    <LogIn className="w-5 h-5 mr-2" />
+                    Sign In
+                  </Button>
+                )}
+              </motion.div>
+
+              {/* Stats */}
+              <motion.div 
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.5 }}
+                className="grid grid-cols-3 gap-6 pt-8"
+              >
+                <div className="text-center">
+                  <div className="text-3xl font-bold text-primary">10x</div>
+                  <div className="text-sm text-muted-foreground">Faster</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-3xl font-bold text-primary">90%</div>
+                  <div className="text-sm text-muted-foreground">Cost Reduction</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-3xl font-bold text-primary">50+</div>
+                  <div className="text-sm text-muted-foreground">AI Models</div>
+                </div>
+              </motion.div>
             </div>
-          </div>
+          </motion.div>
           
-          {/* Right Column: Conditional Upload Component */}
-          {user ? <FileUploadComponent /> : <AuthRequiredUpload />}
+          {/* Right Column: Sliding Fashion Gallery */}
+          <motion.div 
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.6, delay: 0.3 }}
+            className="relative h-[600px] lg:h-[700px]"
+          >
+            <SlidingFashionGallery />
+          </motion.div>
         </div>
       </div>
     </section>

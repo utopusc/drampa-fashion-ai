@@ -19,7 +19,7 @@ export default function SignUpPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState("");
+  const [message, setMessage] = useState("");
   const [agreedToTerms, setAgreedToTerms] = useState(false);
   
   const { register } = useAuth();
@@ -40,50 +40,22 @@ export default function SignUpPage() {
   const passwordStrength = getPasswordStrength(password);
   const passwordsMatch = password === confirmPassword && confirmPassword !== "";
 
-  const validateEmail = (email: string) => {
-    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-  };
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (!name || !email || !password || !confirmPassword) {
-      setError("Please fill in all fields");
-      return;
-    }
-
-    if (!validateEmail(email)) {
-      setError("Please enter a valid email address");
-      return;
-    }
-
-    if (password !== confirmPassword) {
-      setError("Passwords don't match");
-      return;
-    }
-
-    if (passwordStrength < 3) {
-      setError("Password is too weak. Include uppercase, lowercase, numbers, and special characters");
-      return;
-    }
-
-    if (!agreedToTerms) {
-      setError("Please agree to the Terms & Conditions");
-      return;
-    }
-
     setIsLoading(true);
-    setError("");
+    setMessage("");
 
     try {
       const result = await register({ name, email, password });
       if (result.success) {
         router.push("/dashboard");
       } else {
-        setError(result.message || "Registration failed");
+        setMessage(result.message || "Sign up failed");
       }
-    } catch (error) {
-      setError("An error occurred. Please try again.");
+    } catch {
+      setMessage("An error occurred. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -101,13 +73,13 @@ export default function SignUpPage() {
       />
 
       {/* Back to Home Button */}
-      <Link
+              <Link 
         href="/"
         className="absolute top-6 left-6 z-10 flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors group"
-      >
+              >
         <ArrowLeft className="h-4 w-4 transition-transform group-hover:-translate-x-1" />
         Back to Home
-      </Link>
+              </Link>
 
       {/* Main Content */}
       <motion.div
@@ -131,19 +103,19 @@ export default function SignUpPage() {
                 </h1>
                 <p className="text-muted-foreground text-base md:text-lg">
                   Join DRAMPA and start creating
-                </p>
-              </div>
+            </p>
+          </div>
 
               {/* Error Message */}
-              {error && (
+            {message && (
                 <motion.div
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
                   className="mb-6 p-3 rounded-lg bg-destructive/10 border border-destructive/20 text-destructive text-sm"
                 >
-                  {error}
+                {message}
                 </motion.div>
-              )}
+            )}
 
               {/* Form */}
               <form onSubmit={handleSubmit} className="space-y-8">
@@ -151,61 +123,61 @@ export default function SignUpPage() {
                 <div className="space-y-3">
                   <label htmlFor="name" className="text-base font-medium text-foreground">
                     Full Name
-                  </label>
+                </label>
                   <div className="relative">
                     <User className="absolute left-4 top-1/2 transform -translate-y-1/2 h-6 w-6 text-muted-foreground" />
-                    <input
-                      id="name"
-                      type="text"
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
+                  <input
+                    id="name"
+                    type="text"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
                       className="w-full pl-14 pr-4 py-5 text-lg bg-background border-2 border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-colors"
                       placeholder="Enter your full name"
                       required
-                    />
-                  </div>
+                  />
                 </div>
+              </div>
 
                 {/* Email Field */}
                 <div className="space-y-3">
                   <label htmlFor="email" className="text-base font-medium text-foreground">
                     Email
-                  </label>
+                </label>
                   <div className="relative">
                     <Mail className="absolute left-4 top-1/2 transform -translate-y-1/2 h-6 w-6 text-muted-foreground" />
-                    <input
-                      id="email"
-                      type="email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
+                  <input
+              id="email"
+              type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
                       className="w-full pl-14 pr-4 py-5 text-lg bg-background border-2 border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-colors"
                       placeholder="Enter your email"
                       required
-                    />
-                  </div>
-                </div>
+            />
+          </div>
+              </div>
 
                 {/* Password Field */}
                 <div className="space-y-3">
                   <label htmlFor="password" className="text-base font-medium text-foreground">
                     Password
-                  </label>
+                </label>
                   <div className="relative">
                     <Lock className="absolute left-4 top-1/2 transform -translate-y-1/2 h-6 w-6 text-muted-foreground" />
-                    <input
-                      id="password"
-                      type={showPassword ? "text" : "password"}
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
+                  <input
+              id="password"
+                    type={showPassword ? "text" : "password"}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
                       className="w-full pl-14 pr-16 py-5 text-lg bg-background border-2 border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-colors"
                       placeholder="Create a password"
                       required
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowPassword(!showPassword)}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
                       className="absolute right-4 top-1/2 transform -translate-y-1/2 h-6 w-6 text-muted-foreground hover:text-foreground transition-colors"
-                    >
+                  >
                       {showPassword ? <EyeOff /> : <Eye />}
                     </button>
                   </div>
@@ -239,31 +211,31 @@ export default function SignUpPage() {
                           />
                         ))}
                       </div>
-                    </div>
-                  )}
                 </div>
+                  )}
+              </div>
 
                 {/* Confirm Password Field */}
                 <div className="space-y-3">
                   <label htmlFor="confirmPassword" className="text-base font-medium text-foreground">
                     Confirm Password
-                  </label>
+                </label>
                   <div className="relative">
                     <Lock className="absolute left-4 top-1/2 transform -translate-y-1/2 h-6 w-6 text-muted-foreground" />
-                    <input
-                      id="confirmPassword"
-                      type={showConfirmPassword ? "text" : "password"}
-                      value={confirmPassword}
-                      onChange={(e) => setConfirmPassword(e.target.value)}
+                  <input
+                    id="confirmPassword"
+                    type={showConfirmPassword ? "text" : "password"}
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
                       className="w-full pl-14 pr-16 py-5 text-lg bg-background border-2 border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-colors"
                       placeholder="Confirm your password"
                       required
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                       className="absolute right-4 top-1/2 transform -translate-y-1/2 h-6 w-6 text-muted-foreground hover:text-foreground transition-colors"
-                    >
+                  >
                       {showConfirmPassword ? <EyeOff /> : <Eye />}
                     </button>
                   </div>
@@ -277,17 +249,17 @@ export default function SignUpPage() {
                       {passwordsMatch ? "Passwords match" : "Passwords don't match"}
                     </div>
                   )}
-                </div>
+            </div>
 
                 {/* Terms & Conditions */}
                 <div className="flex items-start gap-3 py-2">
-                  <input
-                    type="checkbox"
+              <input
+                type="checkbox"
                     id="terms"
                     checked={agreedToTerms}
                     onChange={(e) => setAgreedToTerms(e.target.checked)}
                     className="mt-1 h-4 w-4 rounded border-border text-primary focus:ring-primary"
-                  />
+              />
                   <label htmlFor="terms" className="text-base text-muted-foreground leading-relaxed">
                     I agree to the{" "}
                     <Link href="/terms" className="text-primary hover:text-primary/80 font-medium">
@@ -297,25 +269,25 @@ export default function SignUpPage() {
                     <Link href="/privacy" className="text-primary hover:text-primary/80 font-medium">
                       Privacy Policy
                     </Link>
-                  </label>
-                </div>
+              </label>
+            </div>
 
                 {/* Sign Up Button */}
                 <motion.button
-                  type="submit"
+                type="submit"
                   disabled={isLoading || !agreedToTerms}
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                   className="w-full bg-primary text-primary-foreground py-5 text-lg font-medium rounded-xl hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                >
+              >
                   {isLoading ? (
                     <span className="flex items-center justify-center gap-2">
                       <div className="h-6 w-6 border-2 border-current border-t-transparent rounded-full animate-spin" />
                       Creating account...
                     </span>
-                  ) : (
+                ) : (
                     "Create Account"
-                  )}
+                )}
                 </motion.button>
               </form>
 
@@ -326,7 +298,7 @@ export default function SignUpPage() {
                   <Link
                     href="/auth/sign-in"
                     className="text-primary hover:text-primary/80 font-medium transition-colors"
-                  >
+              >
                     Sign in
                   </Link>
                 </p>

@@ -16,7 +16,7 @@ export default function SignInPage() {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState("");
+  const [message, setMessage] = useState("");
   
   const { login } = useAuth();
   const router = useRouter();
@@ -24,23 +24,18 @@ export default function SignInPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email || !password) {
-      setError("Please fill in all fields");
-      return;
-    }
-
     setIsLoading(true);
-    setError("");
+    setMessage("");
 
     try {
       const result = await login({ email, password });
       if (result.success) {
         router.push("/dashboard");
       } else {
-        setError(result.message || "Invalid email or password");
+        setMessage(result.message || "Sign in failed");
       }
-    } catch (error) {
-      setError("An error occurred. Please try again.");
+    } catch {
+      setMessage("An error occurred. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -58,13 +53,13 @@ export default function SignInPage() {
       />
 
       {/* Back to Home Button */}
-      <Link
+              <Link
         href="/"
         className="absolute top-6 left-6 z-10 flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors group"
-      >
+              >
         <ArrowLeft className="h-4 w-4 transition-transform group-hover:-translate-x-1" />
         Back to Home
-      </Link>
+              </Link>
 
       {/* Main Content */}
       <motion.div
@@ -88,19 +83,19 @@ export default function SignInPage() {
                 </h1>
                 <p className="text-muted-foreground text-base md:text-lg">
                   Sign in to your DRAMPA account
-                </p>
-              </div>
+            </p>
+          </div>
 
               {/* Error Message */}
-              {error && (
+            {message && (
                 <motion.div
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
                   className="mb-6 p-3 rounded-lg bg-destructive/10 border border-destructive/20 text-destructive text-sm"
                 >
-                  {error}
+                {message}
                 </motion.div>
-              )}
+            )}
 
               {/* Form */}
               <form onSubmit={handleSubmit} className="space-y-8">
@@ -108,74 +103,74 @@ export default function SignInPage() {
                 <div className="space-y-3">
                   <label htmlFor="email" className="text-base font-medium text-foreground">
                     Email
-                  </label>
+                </label>
                   <div className="relative">
                     <Mail className="absolute left-4 top-1/2 transform -translate-y-1/2 h-6 w-6 text-muted-foreground" />
-                    <input
-                      id="email"
-                      type="email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
+                  <input
+                    id="email"
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
                       className="w-full pl-14 pr-4 py-5 text-lg bg-background border-2 border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-colors"
                       placeholder="Enter your email"
                       required
-                    />
-                  </div>
+                  />
                 </div>
+            </div>
 
                 {/* Password Field */}
                 <div className="space-y-3">
                   <label htmlFor="password" className="text-base font-medium text-foreground">
                     Password
-                  </label>
+                </label>
                   <div className="relative">
                     <Lock className="absolute left-4 top-1/2 transform -translate-y-1/2 h-6 w-6 text-muted-foreground" />
-                    <input
-                      id="password"
-                      type={showPassword ? "text" : "password"}
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
+                  <input
+              id="password"
+                    type={showPassword ? "text" : "password"}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
                       className="w-full pl-14 pr-16 py-5 text-lg bg-background border-2 border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-colors"
                       placeholder="Enter your password"
                       required
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowPassword(!showPassword)}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
                       className="absolute right-4 top-1/2 transform -translate-y-1/2 h-6 w-6 text-muted-foreground hover:text-foreground transition-colors"
                     >
                       {showPassword ? <EyeOff /> : <Eye />}
-                    </button>
-                  </div>
-                </div>
+                  </button>
+              </div>
+            </div>
 
                 {/* Sign In Button */}
                 <motion.button
-                  type="submit"
+                type="submit"
                   disabled={isLoading}
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                   className="w-full bg-primary text-primary-foreground py-5 text-lg font-medium rounded-xl hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                >
+              >
                   {isLoading ? (
                     <span className="flex items-center justify-center gap-2">
                       <div className="h-5 w-5 border-2 border-current border-t-transparent rounded-full animate-spin" />
                       Signing in...
                     </span>
-                  ) : (
+            ) : (
                     "Sign In"
-                  )}
+            )}
                 </motion.button>
               </form>
 
               {/* Footer */}
               <div className="mt-12 text-center">
                 <p className="text-lg text-muted-foreground">
-                  Don't have an account?{" "}
+                  Don&apos;t have an account?{" "}
                   <Link
                     href="/auth/sign-up"
                     className="text-primary hover:text-primary/80 font-medium transition-colors"
-                  >
+              >
                     Sign up
                   </Link>
                 </p>

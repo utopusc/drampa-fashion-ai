@@ -1,6 +1,6 @@
-import Image from "next/image";
-import { siteConfig } from "@/lib/config";
 import Link from "next/link";
+import { motion } from "motion/react";
+import { siteConfig } from "@/lib/config";
 
 export function CTASection() {
   const { ctaSection } = siteConfig;

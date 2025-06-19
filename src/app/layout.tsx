@@ -2,12 +2,10 @@
 
 import { Navbar } from "@/components/sections/navbar";
 import { siteConfig } from "@/lib/config";
-import { metadata, viewport } from "./metadata";
 import { Outfit } from "next/font/google";
 import { Providers } from "./providers";
 import "./globals.css";
 import { usePathname } from "next/navigation";
-import Head from "next/head";
 
 const outfit = Outfit({
   variable: "--font-outfit",
@@ -22,6 +20,7 @@ export default function RootLayout({
 }>) {
   const pathname = usePathname();
   const isDashboard = pathname?.startsWith("/dashboard");
+  const isCreate = pathname?.startsWith("/create");
 
   return (
     <html lang="en" suppressHydrationWarning>
@@ -33,8 +32,12 @@ export default function RootLayout({
         className={`${outfit.variable} antialiased font-sans bg-background`}
       >
         <Providers>
-          <div className="max-w-7xl mx-auto relative">
-            {!isDashboard && <Navbar />}
+          <div className="relative">
+            {!isDashboard && !isCreate && (
+              <div className="max-w-7xl mx-auto relative">
+                <Navbar />
+              </div>
+            )}
             {children}
           </div>
         </Providers>

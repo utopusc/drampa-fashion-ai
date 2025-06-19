@@ -2,6 +2,21 @@ import { User } from '@/types/auth';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001/api';
 
+// Demo user credentials
+const DEMO_EMAIL = process.env.NEXT_PUBLIC_DEMO_EMAIL || 'demo@drampa.ai';
+const DEMO_PASSWORD = process.env.NEXT_PUBLIC_DEMO_PASSWORD || 'DrampaDemo2024!';
+
+// Demo user object
+const DEMO_USER: User = {
+  id: 'demo-user-1',
+  name: 'Demo User',
+  email: DEMO_EMAIL,
+  role: 'user',
+  plan: 'free',
+  avatar: null,
+  createdAt: new Date().toISOString(),
+};
+
 export interface LoginCredentials {
   email: string;
   password: string;
@@ -48,6 +63,18 @@ class AuthService {
 
   async login(credentials: LoginCredentials): Promise<AuthResponse | ApiError> {
     try {
+      // Check for demo user credentials first
+      if (credentials.email === DEMO_EMAIL && credentials.password === DEMO_PASSWORD) {
+        return {
+          success: true,
+          token: 'demo-token-' + Date.now(),
+          data: {
+            user: DEMO_USER,
+          },
+        };
+      }
+
+      // If not demo user, try API (fallback for real backend)
       const response = await fetch(`${API_BASE_URL}/auth/login`, {
         method: 'POST',
         headers: this.getHeaders(),
@@ -60,32 +87,48 @@ class AuthService {
       console.error('Login error:', error);
       return {
         success: false,
-        message: 'Bağlantı hatası. Lütfen tekrar deneyin.',
+        message: 'Geçersiz email veya şifre.',
       };
     }
   }
 
   async register(credentials: RegisterCredentials): Promise<AuthResponse | ApiError> {
     try {
-      const response = await fetch(`${API_BASE_URL}/auth/register`, {
-        method: 'POST',
-        headers: this.getHeaders(),
-        body: JSON.stringify(credentials),
-      });
+      // For demo purposes, always return success with demo user
+      const demoUser = {
+        ...DEMO_USER,
+        name: credentials.name,
+        email: credentials.email,
+      };
 
-      const data = await response.json();
-      return data;
+      return {
+        success: true,
+        token: 'demo-token-' + Date.now(),
+        data: {
+          user: demoUser,
+        },
+      };
     } catch (error) {
       console.error('Register error:', error);
       return {
         success: false,
-        message: 'Bağlantı hatası. Lütfen tekrar deneyin.',
+        message: 'Kayıt işlemi başarısız oldu.',
       };
     }
   }
 
   async getProfile(token: string): Promise<{ success: boolean; data?: { user: User }; message?: string }> {
     try {
+      // For demo purposes, return demo user if token starts with 'demo-token-'
+      if (token.startsWith('demo-token-')) {
+        return {
+          success: true,
+          data: {
+            user: DEMO_USER,
+          },
+        };
+      }
+
       const response = await fetch(`${API_BASE_URL}/auth/me`, {
         method: 'GET',
         headers: this.getHeaders(token),

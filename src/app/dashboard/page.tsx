@@ -1,22 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { useState, useRef, useEffect } from "react";
+import { useEffect } from "react";
 import { motion } from "motion/react";
 import { useRouter } from "next/navigation";
-import Navbar from "@/components/ui/navbar";
 import { useAuth } from "@/contexts/AuthContext";
-
-// Option card data structure
-interface OptionCardProps {
-  id: string;
-  title: string;
-  description: string;
-  badge: string;
-  imageSrc: string;
-  videoSrc?: string;
-  href: string;
-}
+import { AuroraText } from "@/components/magicui/aurora-text";
+import { FeatureCard4 } from "@/components/ui/feature-card-4";
 
 const Dashboard = () => {
   const { user, loading } = useAuth();
@@ -45,238 +35,229 @@ const Dashboard = () => {
     return null;
   }
 
-  const options: OptionCardProps[] = [
+  const features = [
     {
-      id: "on-model",
-      title: "On-Model Photos",
-      description: "Start with a photo of someone wearing your product. Easily switch to our models and backgrounds.",
-      badge: "Highest Quality",
-      imageSrc: "/assets/on-model-thumb.jpg",
-      videoSrc: "/assets/on-model-video.mp4",
-      href: "/dashboard/create/on-model"
+      title: "Ever-growing model portfolio",
+      description: "Our unique selection of AI generated models for fashion includes diverse body types, ethnicities, and ages.",
+      image: "/assets/features/675f0118f796b5690d5ffb09_Botika_AIGeneratedFashionModels_Feature_ModelPortfolio.avif"
     },
     {
-      id: "flat-lay",
-      title: "Flat-Lay Photos",
-      description: "Start with a simple flat-lay photo of your product. Easily create professional on-model images.",
-      badge: "Beta",
-      imageSrc: "/assets/flat-lay-thumb.jpg",
-      videoSrc: "/assets/flat-lay-video.mp4",
-      href: "/dashboard/create/flat-lay"
+      title: "Flat-lay to on-model",
+      description: "Turn your packshot images into stunning on-model photos. No photoshoot required.",
+      image: "/assets/features/675f01181b6bcbf650a4c6e2_Botika_AIGeneratedFashionModels_Feature_FlatLayProcess.avif"
     },
     {
-      id: "mannequin",
-      title: "Mannequin Photos",
-      description: "Start with a simple mannequin photo of your product. Easily create professional on-model images.",
-      badge: "Beta",
-      imageSrc: "/assets/mannequin-thumb.jpg",
-      href: "/dashboard/create/mannequin"
+      title: "Swap backgrounds",
+      description: "Enhance basic photos or create stunning lifestyle images with just one click.",
+      image: "/assets/features/675f01184314f55d5e8e295e_Botika_AIGeneratedFashionModels_Feature_BackgroundSelection.avif"
+    },
+    {
+      title: "Enhance cropped photos",
+      description: "Our solution easily integrates AI fashion models into your cropped images.",
+      image: "/assets/features/675f0118a93179f4bcbb0c71_Botika_AIGeneratedFashionModels_Feature_EnhanceCroppedPhotos.avif"
+    },
+    {
+      title: "Perfect your photos",
+      description: "Get flawless photos with Botika's AI-powered touch-ups. Quick and simple for flawless results.",
+      image: "/assets/features/675f0118594137306534d368_Botika_AIGeneratedFashionModels_PerfectYourProductPhotos.avif"
+    },
+    {
+      title: "Share everywhere",
+      description: "Easily connect and export content to your website, social media accounts, and more.",
+      image: "/assets/features/675f01183a136e7b24eccc50_Botika_AIGeneratedFashionModels_Feature_SocialMediaPosts.avif"
     }
   ];
 
+  // Orange theme colors for Aurora effect
+  const orangeAuroraColors = ["#FF7722", "#FF9933", "#FFB366", "#FFC999"];
+
   return (
     <div className="min-h-screen bg-background">
-      <Navbar />
-      
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        {/* Header */}
-        <motion.div
+        {/* Welcome Section */}
+        <motion.div 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
-          className="text-center mb-16"
+          className="text-center mb-20"
         >
-          <h1 className="text-5xl font-bold text-foreground mb-6">Let's get started</h1>
-          <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-            Simply choose the type of photo you want to upload: an on-model photo, a flat-lay, or a mannequin photo.
+          <h1 className="text-5xl md:text-7xl font-bold text-foreground mb-8">
+            Welcome to{" "}
+            <AuroraText colors={orangeAuroraColors} speed={0.8}>
+              DRAMPA
+            </AuroraText>
+          </h1>
+          <p className="text-xl md:text-2xl text-muted-foreground max-w-4xl mx-auto leading-relaxed font-medium">
+            Transform your fashion photography with AI-powered virtual models. Create professional product photos in minutes.
           </p>
         </motion.div>
 
-        {/* Options Grid */}
-        <motion.div
-          initial={{ opacity: 0, y: 40 }}
+        {/* Quick Stats */}
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.2 }}
-          className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-20"
+          transition={{ duration: 0.6, delay: 0.2 }}
+          className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-20"
         >
-          {options.map((option, index) => (
-            <OptionCard key={option.id} option={option} index={index} />
-          ))}
+          <div className="text-center p-6 bg-card rounded-2xl border border-border shadow-sm hover:shadow-md transition-all">
+            <div className="text-3xl font-bold text-primary mb-2">0</div>
+            <div className="text-muted-foreground text-sm font-medium">Projects Created</div>
+          </div>
+          <div className="text-center p-6 bg-card rounded-2xl border border-border shadow-sm hover:shadow-md transition-all">
+            <div className="text-3xl font-bold text-primary mb-2">0</div>
+            <div className="text-muted-foreground text-sm font-medium">Models Generated</div>
+          </div>
+          <div className="text-center p-6 bg-card rounded-2xl border border-border shadow-sm hover:shadow-md transition-all">
+            <div className="text-3xl font-bold text-primary mb-2">7</div>
+            <div className="text-muted-foreground text-sm font-medium">Credits Remaining</div>
+          </div>
+          <div className="text-center p-6 bg-card rounded-2xl border border-border shadow-sm hover:shadow-md transition-all">
+            <div className="text-3xl font-bold text-green-500 mb-2">4.9</div>
+            <div className="text-muted-foreground text-sm font-medium">Avg Rating</div>
+          </div>
         </motion.div>
 
-        {/* Stats Section */}
-        <motion.div
+
+
+        {/* Recent Activity */}
+        <motion.div 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.4 }}
-          className="grid grid-cols-1 md:grid-cols-3 gap-8"
+          className="mb-20"
         >
-          <div className="text-center p-8 bg-card rounded-xl border border-border shadow-sm">
-            <div className="text-3xl font-bold text-foreground mb-2">0</div>
-            <div className="text-muted-foreground">Projects Created</div>
+          <h2 className="text-2xl font-bold text-foreground mb-8 text-center">
+            Recent Activity
+          </h2>
+          <div className="bg-card rounded-2xl border border-border p-8">
+            <div className="text-center py-12">
+              <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg className="w-8 h-8 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                </svg>
+              </div>
+              <h3 className="text-xl font-semibold text-foreground mb-2">No projects yet</h3>
+              <p className="text-muted-foreground mb-6">Create your first AI-generated fashion photo to get started</p>
+              <Link href="/create">
+                <button className="px-6 py-3 bg-primary text-primary-foreground rounded-xl hover:bg-primary/90 transition-colors font-medium">
+                  Create First Project
+                </button>
+              </Link>
+            </div>
           </div>
-          <div className="text-center p-8 bg-card rounded-xl border border-border shadow-sm">
-            <div className="text-3xl font-bold text-foreground mb-2">0</div>
-            <div className="text-muted-foreground">Models Generated</div>
+        </motion.div>
+
+        {/* Features Section */}
+        <motion.div 
+          initial={{ opacity: 0, y: 40 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.5 }}
+          className="mb-20"
+        >
+          <h2 className="text-4xl md:text-6xl font-bold text-foreground text-center mb-6">
+            <AuroraText colors={orangeAuroraColors} speed={0.6}>
+              AI solutions
+            </AuroraText>{" "}
+            to boost your fashion brand
+          </h2>
+          <p className="text-lg md:text-xl text-muted-foreground text-center mb-16 max-w-3xl mx-auto font-medium">
+            Discover powerful AI tools designed to elevate your fashion brand with professional-quality images
+          </p>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+            {features.map((feature, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.5 + index * 0.1 }}
+                className="bg-card rounded-2xl border border-border overflow-hidden hover:shadow-xl transition-all duration-300 hover:border-primary/20 group"
+              >
+                <div className="aspect-[4/3] bg-muted overflow-hidden">
+                  <img 
+                    src={feature.image} 
+                    alt={feature.title}
+                    className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      target.style.display = 'none';
+                      const parent = target.parentElement;
+                      if (parent) {
+                        parent.innerHTML = '<div class="flex items-center justify-center h-full text-muted-foreground">Image</div>';
+                      }
+                    }}
+                  />
+                </div>
+                <div className="p-8">
+                  <h3 className="text-xl md:text-2xl font-bold text-foreground mb-4 leading-tight">
+                    {feature.title}
+                  </h3>
+                  <p className="text-muted-foreground text-base md:text-lg leading-relaxed">
+                    {feature.description}
+                  </p>
+                </div>
+              </motion.div>
+            ))}
           </div>
-          <div className="text-center p-8 bg-card rounded-xl border border-border shadow-sm">
-            <div className="text-3xl font-bold text-foreground mb-2">7</div>
-            <div className="text-muted-foreground">Credits Remaining</div>
+        </motion.div>
+
+        {/* AI Model Gallery Section */}
+        <motion.div 
+          initial={{ opacity: 0, y: 40 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.6 }}
+          className="mb-20"
+        >
+          <div className="text-center mb-12">
+            <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-6">
+              Meet Our{" "}
+              <AuroraText colors={orangeAuroraColors} speed={0.6}>
+                AI Models
+              </AuroraText>
+            </h2>
+            <p className="text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto font-medium">
+              Interact with our diverse collection of AI fashion models designed to bring your products to life
+            </p>
+          </div>
+          
+          <div className="flex justify-center">
+            <FeatureCard4 />
+          </div>
+        </motion.div>
+
+        {/* Get Started Section */}
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.8 }}
+          className="text-center"
+        >
+          <div className="bg-gradient-to-br from-primary/5 via-primary/10 to-primary/5 border border-primary/20 rounded-3xl p-12 md:p-16">
+            <h3 className="text-3xl md:text-5xl font-bold text-foreground mb-6">
+              Ready to{" "}
+              <AuroraText colors={orangeAuroraColors} speed={0.7}>
+                Get Started
+              </AuroraText>
+              ?
+            </h3>
+            <p className="text-muted-foreground mb-10 max-w-3xl mx-auto text-lg md:text-xl leading-relaxed font-medium">
+              Upload your product photos and let our AI create stunning on-model images with professional backgrounds.
+            </p>
+            <Link href="/create">
+              <motion.button
+                className="bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 text-primary-foreground font-bold px-12 py-5 rounded-2xl transition-all shadow-lg hover:shadow-xl text-lg md:text-xl"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <AuroraText colors={["#FFFFFF", "#FFF5F0", "#FFFFFF", "#FFE5D9"]} speed={1.2}>
+                  Create Your First Project
+                </AuroraText>
+              </motion.button>
+            </Link>
           </div>
         </motion.div>
       </div>
     </div>
-  );
-};
-
-// Individual Option Card Component
-interface OptionCardComponentProps {
-  option: OptionCardProps;
-  index: number;
-}
-
-const OptionCard = ({ option, index }: OptionCardComponentProps) => {
-  const [isHovered, setIsHovered] = useState(false);
-  const [imageError, setImageError] = useState(false);
-  const videoRef = useRef<HTMLVideoElement>(null);
-
-  const handleMouseEnter = () => {
-    setIsHovered(true);
-    if (videoRef.current && option.videoSrc) {
-      videoRef.current.play().catch(error => console.error("Video play error:", error));
-    }
-  };
-
-  const handleMouseLeave = () => {
-    setIsHovered(false);
-    if (videoRef.current && option.videoSrc) {
-      videoRef.current.pause();
-      videoRef.current.currentTime = 0;
-    }
-  };
-
-  const handleImageError = () => {
-    console.error(`Failed to load image: ${option.imageSrc}`);
-    setImageError(true);
-  };
-
-  // Helper function to get the appropriate badge colors
-  const getBadgeStyles = (badge: string) => {
-    if (badge === "Highest Quality") {
-      return "bg-purple-100 text-purple-700 border-purple-200 dark:bg-purple-900/30 dark:text-purple-300 dark:border-purple-700";
-    }
-    return "bg-blue-100 text-blue-700 border-blue-200 dark:bg-blue-900/30 dark:text-blue-300 dark:border-blue-700";
-  };
-
-  const iconMap = {
-    "on-model": (
-      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-12 h-12">
-        <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
-      </svg>
-    ),
-    "flat-lay": (
-      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-12 h-12">
-        <path strokeLinecap="round" strokeLinejoin="round" d="M6.429 9.75 2.25 12l4.179 2.25m0-4.5 5.571 3 5.571-3m-11.142 0L2.25 7.5 12 2.25l9.75 5.25-4.179 2.25m0 0L21.75 12l-4.179 2.25m0 0 4.179 2.25L12 21.75 2.25 16.5l4.179-2.25m11.142 0-5.571 3-5.571-3" />
-      </svg>
-    ),
-    "mannequin": (
-      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-12 h-12">
-        <path strokeLinecap="round" strokeLinejoin="round" d="M9.568 3H5.25A2.25 2.25 0 0 0 3 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 0 0 5.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 0 0 9.568 3Z" />
-        <path strokeLinecap="round" strokeLinejoin="round" d="M6 6h.008v.008H6V6Z" />
-      </svg>
-    )
-  };
-
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 30 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.6, delay: index * 0.1 }}
-      className="group"
-    >
-      <Link href={option.href}>
-        <motion.div 
-          className="bg-card rounded-2xl shadow-lg overflow-hidden border border-border hover:shadow-xl transition-all cursor-pointer h-full hover:border-primary/20"
-          whileHover={{ y: -8, scale: 1.02 }}
-          transition={{ duration: 0.3 }}
-          onMouseEnter={handleMouseEnter}
-          onMouseLeave={handleMouseLeave}
-        >
-          {/* Visual Preview Section - Single Large Image */}
-          <div className="relative h-80 bg-gradient-to-br from-muted/50 to-muted overflow-hidden">
-            {/* Badge */}
-            <div className="absolute top-6 left-6 z-10">
-              <span className={`inline-flex items-center px-4 py-2 rounded-full text-sm font-medium border ${getBadgeStyles(option.badge)}`}>
-                {option.badge}
-              </span>
-            </div>
-
-            {/* Main Image/Video Container */}
-            <div className="relative h-full w-full">
-              {/* Static Image */}
-              {!imageError ? (
-                <img 
-                  src={option.imageSrc} 
-                  alt={option.title}
-                  onError={handleImageError}
-                  className={`w-full h-full object-cover transition-opacity duration-500 ${isHovered && option.videoSrc ? 'opacity-0' : 'opacity-100'}`}
-                />
-              ) : (
-                <div className={`w-full h-full flex items-center justify-center bg-muted transition-opacity duration-500 ${isHovered && option.videoSrc ? 'opacity-0' : 'opacity-100'}`}>
-                  <div className="text-muted-foreground">
-                    {iconMap[option.id as keyof typeof iconMap]}
-                  </div>
-                </div>
-              )}
-
-              {/* Video Overlay */}
-              {option.videoSrc && (
-                <video 
-                  ref={videoRef}
-                  className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-500 ${isHovered ? 'opacity-100' : 'opacity-0'}`}
-                  loop
-                  muted
-                  playsInline
-                >
-                  <source src={option.videoSrc} type="video/mp4" />
-                  Your browser does not support the video tag.
-                </video>
-              )}
-
-              {/* Overlay gradient for better text readability */}
-              <div className="absolute inset-0 bg-gradient-to-t from-background/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-            </div>
-          </div>
-
-          {/* Content Section */}
-          <div className="p-8 space-y-6">
-            <div className="flex flex-col gap-4">
-              <div className="flex items-center gap-4">
-                <span className="bg-muted p-3 rounded-xl text-muted-foreground group-hover:bg-primary group-hover:text-primary-foreground transition-colors duration-300">
-                  {iconMap[option.id as keyof typeof iconMap]}
-                </span>
-                <h3 className="text-2xl font-bold text-foreground group-hover:text-primary transition-colors">
-                  {option.title}
-                </h3>
-              </div>
-              <p className="text-muted-foreground leading-relaxed text-base">
-                {option.description}
-              </p>
-            </div>
-            
-            <motion.button 
-              className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-semibold py-4 px-6 rounded-xl transition-all flex items-center justify-center gap-3 group-hover:shadow-lg transform group-hover:scale-105 duration-300"
-              whileTap={{ scale: 0.95 }}
-            >
-              Start Creating
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5 group-hover:translate-x-1 transition-transform">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
-              </svg>
-            </motion.button>
-          </div>
-        </motion.div>
-      </Link>
-    </motion.div>
   );
 };
 

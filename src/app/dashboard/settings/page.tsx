@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { User, Lock, Mail, Camera, Trash2, Bell, Shield, Globe, Palette } from "lucide-react";
 import { motion } from "framer-motion";
-import Navbar from "@/components/ui/navbar";
 
 interface TabProps {
   id: string;
@@ -460,76 +459,74 @@ export default function SettingsPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      <Navbar />
-      
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
         >
-          {/* Header */}
+      {/* Header */}
           <div className="mb-8">
             <h1 className="text-3xl font-bold text-foreground">Account Settings</h1>
             <p className="text-muted-foreground mt-2">
               Configure your account preferences, notifications, and security options
-            </p>
-          </div>
+        </p>
+      </div>
 
-          {/* Success/Error Messages */}
-          {successMessage && (
-            <motion.div
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
+      {/* Success/Error Messages */}
+      {successMessage && (
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
               className="mb-6 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 text-green-600 dark:text-green-400 px-4 py-3 rounded-lg"
-            >
-              {successMessage}
-            </motion.div>
-          )}
+        >
+          {successMessage}
+        </motion.div>
+      )}
 
-          {errorMessage && (
-            <motion.div
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
+      {errorMessage && (
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
               className="mb-6 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 px-4 py-3 rounded-lg"
-            >
-              {errorMessage}
-            </motion.div>
-          )}
+        >
+          {errorMessage}
+        </motion.div>
+      )}
 
           {/* Tab Navigation */}
           <div className="border-b border-border mb-8">
-            <nav className="-mb-px flex space-x-8">
-              {tabs.map((tab) => (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
+        <nav className="-mb-px flex space-x-8">
+          {tabs.map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
                   className={`flex items-center gap-2 py-2 px-1 border-b-2 font-medium text-sm transition-colors ${
-                    activeTab === tab.id
+                activeTab === tab.id
                       ? "border-primary text-foreground"
                       : "border-transparent text-muted-foreground hover:text-foreground hover:border-muted"
-                  }`}
-                >
-                  {tab.icon}
-                  {tab.label}
-                </button>
-              ))}
-            </nav>
-          </div>
+              }`}
+            >
+              {tab.icon}
+              {tab.label}
+            </button>
+          ))}
+        </nav>
+      </div>
 
-          {/* Tab Content */}
-          <motion.div
-            key={activeTab}
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.2 }}
+      {/* Tab Content */}
+      <motion.div
+        key={activeTab}
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.2 }}
             className="bg-card rounded-lg border border-border shadow-sm"
-          >
+      >
             <div className="p-6">
-              {renderTabContent()}
+        {renderTabContent()}
             </div>
           </motion.div>
-        </motion.div>
+      </motion.div>
       </div>
     </div>
   );

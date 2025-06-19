@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { User, Camera, Save, Eye, EyeOff } from "lucide-react";
-import Navbar from "@/components/ui/navbar";
 import { useAuth } from "@/contexts/AuthContext";
 
 export default function ProfilePage() {
@@ -87,8 +86,6 @@ export default function ProfilePage() {
 
   return (
     <div className="min-h-screen bg-background">
-      <Navbar />
-      
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
