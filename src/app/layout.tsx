@@ -34,9 +34,7 @@ export default function RootLayout({
         <Providers>
           <div className="relative">
             {!isDashboard && !isCreate && (
-              <div className="max-w-7xl mx-auto relative">
-                <Navbar />
-              </div>
+              <Navbar />
             )}
             {children}
           </div>
