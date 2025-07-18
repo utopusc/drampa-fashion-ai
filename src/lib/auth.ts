@@ -162,8 +162,13 @@ class AuthService {
   saveToken(token: string): void {
     if (typeof window !== 'undefined') {
       localStorage.setItem('drampa_token', token);
-      // Also set as httpOnly cookie for middleware security
-      document.cookie = `auth-token=${token}; path=/; max-age=604800; SameSite=Strict`;
+      // Set cookie for middleware to check (7 days = 604800 seconds)
+      const expiryDate = new Date();
+      expiryDate.setDate(expiryDate.getDate() + 7);
+      // Don't use Secure flag on localhost
+      const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+      const secureFlag = isLocalhost ? '' : '; Secure';
+      document.cookie = `auth-token=${token}; path=/; expires=${expiryDate.toUTCString()}; SameSite=Lax${secureFlag}`;
     }
   }
 

@@ -32,15 +32,26 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const savedUser = authService.getUser();
 
       if (token && savedUser) {
-        // Verify token is still valid by fetching fresh user data
-        const response = await authService.getProfile(token);
-        if (response.success && response.data) {
-          setUser(response.data.user);
-          authService.saveUser(response.data.user);
-        } else {
-          // Token is invalid, clear local storage
-          authService.logout();
-          setUser(null);
+        // First set the saved user immediately to avoid flash
+        setUser(savedUser);
+        
+        // Then verify token is still valid by fetching fresh user data
+        try {
+          const response = await authService.getProfile(token);
+          if (response.success && response.data) {
+            setUser(response.data.user);
+            authService.saveUser(response.data.user);
+            // Re-save token to refresh cookie expiry
+            authService.saveToken(token);
+          } else {
+            // Token is invalid, clear local storage
+            authService.logout();
+            setUser(null);
+          }
+        } catch (error) {
+          // If profile fetch fails, keep the saved user but log the error
+          console.error('Profile fetch error:', error);
+          // Keep the user logged in with saved data
         }
       }
     } catch (error) {
