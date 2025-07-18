@@ -1,0 +1,405 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-outfit);
+  --font-mono: var(--font-geist-mono);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --animate-accordion-down: accordion-down 0.2s ease-out;
+  --animate-accordion-up: accordion-up 0.2s ease-out;
+  --animate-marquee: marquee var(--duration) infinite linear;
+  --animate-marquee-vertical: marquee-vertical var(--duration) linear infinite;
+  --animate-orbit: orbit calc(var(--duration) * 1s) linear infinite;
+  --animate-slide-down: slide-down 300ms cubic-bezier(0.87, 0, 0.13, 1);
+  --animate-slide-up: slide-up 300ms cubic-bezier(0.87, 0, 0.13, 1);
+  --scaleIn: scaleIn 200ms ease;
+  --scaleOut: scaleOut 200ms ease;
+  --fadeIn: fadeIn 200ms ease;
+  --fadeOut: fadeOut 200ms ease;
+  --enterFromLeft: enterFromLeft 250ms ease;
+  --enterFromRight: enterFromRight 250ms ease;
+  --exitToLeft: exitToLeft 250ms ease;
+  --exitToRight: exitToRight 250ms ease;
+  --animate-elliptical-orbit: elliptical-orbit 20s linear infinite;
+  --animate-meteor: meteor linear;
+  --animate-aurora: aurora 8s ease-in-out infinite alternate;
+
+  @keyframes orbit {
+    0% {
+      transform: rotate(calc(var(--angle) * 1deg))
+        translateY(calc(var(--radius) * 1px)) rotate(calc(var(--angle) * -1deg));
+    }
+    100% {
+      transform: rotate(calc(var(--angle) * 1deg + 360deg))
+        translateY(calc(var(--radius) * 1px))
+        rotate(calc((var(--angle) * -1deg) - 360deg));
+    }
+  }
+
+  @keyframes accordion-down {
+    from {
+      height: 0;
+    }
+    to {
+      height: var(--radix-accordion-content-height);
+    }
+  }
+
+  @keyframes accordion-up {
+    from {
+      height: var(--radix-accordion-content-height);
+    }
+    to {
+      height: 0;
+    }
+  }
+
+  @keyframes marquee {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(calc(-100% - var(--gap)));
+    }
+  }
+
+  @keyframes marquee-vertical {
+    from {
+      transform: translateY(0);
+    }
+    to {
+      transform: translateY(calc(-100% - var(--gap)));
+    }
+  }
+  @keyframes slide-down {
+    from {
+      height: 0px;
+    }
+    to {
+      height: var(--radix-accordion-content-height);
+    }
+  }
+
+  @keyframes slide-up {
+    from {
+      height: var(--radix-accordion-content-height);
+    }
+    to {
+      height: 0px;
+    }
+  }
+
+  /* Add this to your globals.css */
+  @keyframes enterFromRight {
+    from {
+      opacity: 0;
+      transform: translateX(200px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  @keyframes enterFromLeft {
+    from {
+      opacity: 0;
+      transform: translateX(-200px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  @keyframes exitToRight {
+    from {
+      opacity: 1;
+      transform: translateX(0);
+    }
+    to {
+      opacity: 0;
+      transform: translateX(200px);
+    }
+  }
+
+  @keyframes exitToLeft {
+    from {
+      opacity: 1;
+      transform: translateX(0);
+    }
+    to {
+      opacity: 0;
+      transform: translateX(-200px);
+    }
+  }
+
+  @keyframes scaleIn {
+    from {
+      opacity: 0;
+      transform: rotateX(-30deg) scale(0.9);
+    }
+    to {
+      opacity: 1;
+      transform: rotateX(0deg) scale(1);
+    }
+  }
+
+  @keyframes scaleOut {
+    from {
+      opacity: 1;
+      transform: rotateX(0deg) scale(1);
+    }
+    to {
+      opacity: 0;
+      transform: rotateX(-10deg) scale(0.95);
+    }
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes fadeOut {
+    from {
+      opacity: 1;
+    }
+    to {
+      opacity: 0;
+    }
+  }
+
+  @keyframes meteor {
+    0% {
+      transform: rotate(215deg) translateX(0);
+      opacity: 0;
+    }
+    10% {
+      opacity: 1;
+    }
+    70% {
+      opacity: 1;
+    }
+    100% {
+      transform: rotate(215deg) translateX(-500px);
+      opacity: 0;
+    }
+  }
+
+  @keyframes elliptical-orbit {
+    0% {
+      transform: translateX(-50%) rotate(0deg) translateY(-50%) rotate(0deg);
+    }
+    100% {
+      transform: translateX(-50%) rotate(360deg) translateY(-50%) rotate(-360deg);
+    }
+  }
+
+  @keyframes aurora {
+    0% {
+      background-position: 0% 50%;
+      transform: rotate(-2deg) scale(1);
+    }
+    25% {
+      background-position: 100% 50%;
+      transform: rotate(2deg) scale(1.02);
+    }
+    50% {
+      background-position: 0% 100%;
+      transform: rotate(-1deg) scale(0.98);
+    }
+    75% {
+      background-position: 100% 0%;
+      transform: rotate(1deg) scale(1.01);
+    }
+    100% {
+      background-position: 0% 50%;
+      transform: rotate(-2deg) scale(1);
+    }
+  }
+}
+
+:root {
+  --background: #ffffff;
+  --foreground: #000000;
+  --card: #ffffff;
+  --card-foreground: #000000;
+  --popover: #ffffff;
+  --popover-foreground: #000000;
+  --primary: #000000;
+  --primary-foreground: #ffffff;
+  --secondary: #f5f5f5;
+  --secondary-foreground: #000000;
+  --muted: #f9f9f9;
+  --muted-foreground: #6b7280;
+  --accent: #f3f4f6;
+  --accent-foreground: #000000;
+  --destructive: #ef4444;
+  --destructive-foreground: #ffffff;
+  --border: #e5e7eb;
+  --input: #f3f4f6;
+  --ring: #000000;
+  --chart-1: #000000;
+  --chart-2: #4b5563;
+  --chart-3: #6b7280;
+  --chart-4: #9ca3af;
+  --chart-5: #d1d5db;
+  --radius: 0.625rem;
+  --sidebar: #fafafa;
+  --sidebar-foreground: #000000;
+  --sidebar-primary: #000000;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #f3f4f6;
+  --sidebar-accent-foreground: #000000;
+  --sidebar-border: #e5e7eb;
+  --sidebar-ring: #000000;
+}
+
+.dark {
+  --background: #0a0a0a;
+  --foreground: #ffffff;
+  --card: #141414;
+  --card-foreground: #ffffff;
+  --popover: #141414;
+  --popover-foreground: #ffffff;
+  --primary: #ffffff;
+  --primary-foreground: #000000;
+  --secondary: #1a1a1a;
+  --secondary-foreground: #ffffff;
+  --muted: #262626;
+  --muted-foreground: #a3a3a3;
+  --accent: #262626;
+  --accent-foreground: #ffffff;
+  --destructive: #ef4444;
+  --destructive-foreground: #ffffff;
+  --border: #333333;
+  --input: #262626;
+  --ring: #ffffff;
+  --chart-1: #ffffff;
+  --chart-2: #d4d4d8;
+  --chart-3: #a1a1aa;
+  --chart-4: #71717a;
+  --chart-5: #52525b;
+  --sidebar: #141414;
+  --sidebar-foreground: #ffffff;
+  --sidebar-primary: #ffffff;
+  --sidebar-primary-foreground: #000000;
+  --sidebar-accent: #262626;
+  --sidebar-accent-foreground: #ffffff;
+  --sidebar-border: #333333;
+  --sidebar-ring: #ffffff;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  html {
+    scroll-behavior: smooth;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+
+  /* Auth Page Specific Styles */
+  .auth-gradient {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  }
+
+  .auth-gradient-dark {
+    background: linear-gradient(135deg, #2D3748 0%, #1A202C 100%);
+  }
+
+  .glass-effect {
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+  }
+
+  /* Loading animations */
+  .animate-spin {
+    animation: spin 1s linear infinite;
+  }
+
+  @keyframes spin {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  /* Focus ring improvements */
+  .focus-ring {
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background;
+  }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: hsl(var(--muted-foreground) / 0.3);
+    border-radius: 4px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--muted-foreground) / 0.5);
+  }
+
+  .dark ::-webkit-scrollbar-thumb {
+    background: hsl(var(--muted-foreground) / 0.4);
+  }
+
+  .dark ::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--muted-foreground) / 0.6);
+  }
+}
