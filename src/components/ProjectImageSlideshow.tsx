@@ -1,125 +1,115 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface ProjectImageSlideshowProps {
-  nodes: any[];
+  images?: string[];
+  nodes?: any[];
+  projectName?: string;
   className?: string;
 }
 
-export default function ProjectImageSlideshow({ nodes, className = "" }: ProjectImageSlideshowProps) {
+export default function ProjectImageSlideshow({ images, nodes, projectName = 'Project', className }: ProjectImageSlideshowProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [allImages, setAllImages] = useState<string[]>([]);
+  const [isHovered, setIsHovered] = useState(false);
 
-  useEffect(() => {
-    // Extract all generated images from nodes
-    const images: string[] = [];
-    
-    nodes.forEach(node => {
-      if (node.data?.generatedImages && Array.isArray(node.data.generatedImages)) {
-        node.data.generatedImages.forEach((img: any) => {
-          if (img.url) {
-            images.push(img.url);
-          }
-        });
-      }
-    });
-    
-    setAllImages(images);
-  }, [nodes]);
+  // Extract images from nodes if nodes provided
+  const allImages = images || (nodes ? nodes.flatMap(node => 
+    node.data?.generatedImages?.map((img: any) => img.url) || []
+  ) : []);
 
+  // Auto-play slideshow
   useEffect(() => {
-    // Auto slide
-    if (allImages.length > 1) {
+    if (!isHovered && allImages.length > 1) {
       const interval = setInterval(() => {
         setCurrentIndex((prev) => (prev + 1) % allImages.length);
-      }, 3000); // Change slide every 3 seconds
-      
+      }, 3000); // Change image every 3 seconds
+
       return () => clearInterval(interval);
     }
-  }, [allImages.length]);
+  }, [isHovered, allImages.length]);
+
+  const goToPrevious = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    e.preventDefault();
+    setCurrentIndex((prev) => (prev - 1 + allImages.length) % allImages.length);
+  };
+
+  const goToNext = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    e.preventDefault();
+    setCurrentIndex((prev) => (prev + 1) % allImages.length);
+  };
 
   if (allImages.length === 0) {
     return (
-      <div className={`${className} flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800`}>
-        <div className="text-center p-8">
-          <div className="text-4xl mb-2">📸</div>
-          <p className="text-sm text-muted-foreground">Empty Project</p>
-        </div>
+      <div className="aspect-[3/4] bg-muted rounded-lg flex items-center justify-center">
+        <p className="text-muted-foreground text-sm">No images yet</p>
       </div>
     );
   }
 
   return (
-    <div className={`${className} relative overflow-hidden bg-black`}>
+    <div 
+      className={`relative aspect-[3/4] bg-muted rounded-lg overflow-hidden group ${className || ''}`}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
       {/* Main Image */}
-      <div className="relative w-full h-full">
-        <Image
-          src={allImages[currentIndex]}
-          alt={`Generated image ${currentIndex + 1}`}
-          fill
-          className="object-cover"
-          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-        />
-        
-        {/* Gradient Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-      </div>
+      <Image
+        src={allImages[currentIndex]}
+        alt={`${projectName} - Image ${currentIndex + 1}`}
+        fill
+        className="object-cover transition-transform duration-300 group-hover:scale-105"
+      />
 
-      {/* Navigation Arrows - Show on hover if multiple images */}
+      {/* Navigation Arrows - Only show if more than 1 image */}
       {allImages.length > 1 && (
         <>
           <button
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              setCurrentIndex((prev) => (prev - 1 + allImages.length) % allImages.length);
-            }}
-            className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-white/80 hover:bg-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 shadow-lg"
+            onClick={goToPrevious}
+            className="absolute left-2 top-1/2 -translate-y-1/2 p-1.5 bg-black/50 hover:bg-black/70 text-white rounded-full opacity-0 group-hover:opacity-100 transition-all duration-200"
+            aria-label="Previous image"
           >
-            <ChevronLeft className="w-4 h-4 text-gray-800" />
+            <ChevronLeft className="w-4 h-4" />
           </button>
           
           <button
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              setCurrentIndex((prev) => (prev + 1) % allImages.length);
-            }}
-            className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-white/80 hover:bg-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 shadow-lg"
+            onClick={goToNext}
+            className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 bg-black/50 hover:bg-black/70 text-white rounded-full opacity-0 group-hover:opacity-100 transition-all duration-200"
+            aria-label="Next image"
           >
-            <ChevronRight className="w-4 h-4 text-gray-800" />
+            <ChevronRight className="w-4 h-4" />
           </button>
+
+          {/* Dots Indicator */}
+          <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+            {allImages.map((_, index) => (
+              <button
+                key={index}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  e.preventDefault();
+                  setCurrentIndex(index);
+                }}
+                className={`w-1.5 h-1.5 rounded-full transition-all duration-200 ${
+                  index === currentIndex 
+                    ? 'bg-white w-4' 
+                    : 'bg-white/50 hover:bg-white/75'
+                }`}
+                aria-label={`Go to image ${index + 1}`}
+              />
+            ))}
+          </div>
         </>
       )}
 
-      {/* Dots Indicator */}
+      {/* Image Counter */}
       {allImages.length > 1 && (
-        <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-          {allImages.map((_, index) => (
-            <button
-              key={index}
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                setCurrentIndex(index);
-              }}
-              className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${
-                index === currentIndex
-                  ? 'bg-white w-4'
-                  : 'bg-white/50 hover:bg-white/75'
-              }`}
-            />
-          ))}
-        </div>
-      )}
-
-      {/* Image Count Badge */}
-      {allImages.length > 1 && (
-        <div className="absolute top-3 right-3 px-2 py-1 bg-black/50 backdrop-blur-sm rounded-full text-xs text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-          {currentIndex + 1} / {allImages.length}
+        <div className="absolute top-2 right-2 px-2 py-1 bg-black/50 text-white text-xs rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+          {currentIndex + 1}/{allImages.length}
         </div>
       )}
     </div>

@@ -28,7 +28,7 @@ import {
 } from '@heroicons/react/24/outline';
 import { HeartIcon as HeartIconSolid } from '@heroicons/react/24/solid';
 import { SparklesIcon as SparklesIconSolid } from '@heroicons/react/24/solid';
-import { Check, Loader2, Package2 } from 'lucide-react';
+import { Check, Loader2, Package2, Plus } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePipelineStore } from '@/store/pipelineStore';
@@ -241,8 +241,42 @@ export default function PortraitEditor({ onGenerateClick }: PortraitEditorProps)
     if (modelNode?.data?.generatedImages && modelNode.data.generatedImages.length > 0) {
       // Set to last image when new image is added
       setCurrentImageIndex(modelNode.data.generatedImages.length - 1);
+      
+      // Save images to localStorage for persistence
+      const projectId = window.location.search.includes('project=') 
+        ? new URLSearchParams(window.location.search).get('project') 
+        : 'default';
+      if (projectId) {
+        localStorage.setItem(`portrait-images-${projectId}`, JSON.stringify(modelNode.data.generatedImages));
+      }
     }
   }, [modelNode?.data?.generatedImages?.length]);
+  
+  // Load images from localStorage on mount
+  useEffect(() => {
+    const projectId = window.location.search.includes('project=') 
+      ? new URLSearchParams(window.location.search).get('project') 
+      : 'default';
+    
+    if (projectId && modelNode) {
+      const savedImages = localStorage.getItem(`portrait-images-${projectId}`);
+      if (savedImages) {
+        try {
+          const images = JSON.parse(savedImages);
+          if (images.length > 0 && (!modelNode.data.generatedImages || modelNode.data.generatedImages.length === 0)) {
+            updateNode(modelNode.id, {
+              data: {
+                ...modelNode.data,
+                generatedImages: images
+              }
+            });
+          }
+        } catch (e) {
+          console.error('Failed to load saved images:', e);
+        }
+      }
+    }
+  }, [modelNode?.id]);
 
   // Load user products
   useEffect(() => {
@@ -1747,7 +1781,34 @@ export default function PortraitEditor({ onGenerateClick }: PortraitEditorProps)
                     </div>
                   </div>
                   
-                  <div className="pt-4 border-t border-border">
+                  <div className="pt-4 border-t border-border space-y-3">
+                    <button 
+                      onClick={() => {
+                        // Add image to the portrait editor
+                        if (selectedImage && modelNode) {
+                          const currentImages = modelNode.data.generatedImages || [];
+                          // Check if image already exists
+                          const exists = currentImages.some((img: any) => img.url === selectedImage.url);
+                          if (!exists) {
+                            updateNode(modelNode.id, {
+                              data: {
+                                ...modelNode.data,
+                                generatedImages: [...currentImages, selectedImage]
+                              }
+                            });
+                            toast.success('Image added to your collection');
+                          } else {
+                            toast.info('Image already in your collection');
+                          }
+                        }
+                        setShowImageModal(false);
+                        setSelectedImage(null);
+                      }}
+                      className="w-full bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-medium px-6 py-3 rounded-xl transition-all duration-200 flex items-center justify-center gap-2"
+                    >
+                      <Plus className="w-5 h-5" />
+                      Add to Editor
+                    </button>
                     <button 
                       onClick={() => {
                         setShowImageModal(false);
