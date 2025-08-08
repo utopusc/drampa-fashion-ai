@@ -2,7 +2,7 @@ import axios from 'axios';
 
 // Create axios instance with default config
 const api = axios.create({
-  baseURL: 'http://31.220.81.177/api',
+  baseURL: `${process.env.NEXT_PUBLIC_BACKEND_URL || 'https://31.220.81.177'}/api`,
   headers: {
     'Content-Type': 'application/json',
   },

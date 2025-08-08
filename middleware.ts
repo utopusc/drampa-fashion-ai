@@ -15,9 +15,23 @@ const publicRoutes = [
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   
+  // Add security headers for mixed content handling
+  const response = NextResponse.next();
+  
+  // Temporarily allow mixed content for HTTP backend
+  if (process.env.NEXT_PUBLIC_BACKEND_URL?.startsWith('http://')) {
+    response.headers.set(
+      'Content-Security-Policy',
+      "default-src 'self'; connect-src 'self' http://31.220.81.177 https://31.220.81.177 ws: wss:; script-src 'self' 'unsafe-eval' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: http://31.220.81.177 https://31.220.81.177;"
+    );
+    // Allow HTTP requests from HTTPS (development only)
+    response.headers.set('X-Frame-Options', 'SAMEORIGIN');
+    response.headers.set('X-Content-Type-Options', 'nosniff');
+  }
+  
   // Allow public routes
   if (publicRoutes.some(route => pathname === route || pathname.startsWith(route))) {
-    return NextResponse.next();
+    return response;
   }
   
   // Allow static files and API routes (except protected ones)
@@ -44,7 +58,7 @@ export function middleware(request: NextRequest) {
   }
   
   // Allow the request to continue (token will be validated by individual API routes)
-  return NextResponse.next();
+  return response;
 }
 
 export const config = {

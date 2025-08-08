@@ -1,6 +1,6 @@
 import { User } from '@/types/auth';
 
-const API_BASE_URL = 'http://31.220.81.177';
+const API_BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'https://31.220.81.177';
 
 export interface LoginCredentials {
   email: string;
@@ -54,6 +54,23 @@ class AuthService {
         body: JSON.stringify(credentials),
       });
 
+      // Check if response is ok
+      if (!response.ok) {
+        // Try to parse error response
+        try {
+          const errorData = await response.json();
+          return {
+            success: false,
+            message: errorData.message || `HTTP Error: ${response.status}`,
+          };
+        } catch {
+          return {
+            success: false,
+            message: `Network error: ${response.status} ${response.statusText}`,
+          };
+        }
+      }
+
       const data = await response.json();
       
       // Convert credits from backend (10) to cents (1000)
@@ -64,9 +81,16 @@ class AuthService {
       return data;
     } catch (error) {
       console.error('Login error:', error);
+      // Better error message for network issues
+      if (error instanceof TypeError && error.message.includes('fetch')) {
+        return {
+          success: false,
+          message: 'Connection failed. Please check your internet connection or try again later.',
+        };
+      }
       return {
         success: false,
-        message: 'Invalid email or password.',
+        message: 'Login failed. Please check your credentials and try again.',
       };
     }
   }
