@@ -92,6 +92,32 @@ class ImageService {
       throw error.response?.data || error;
     }
   }
+
+  async saveGeneratedImage(data: {
+    url: string;
+    prompt: string;
+    model?: {
+      id: string;
+      name: string;
+      image?: string;
+    };
+    styleItems?: Array<{
+      type: 'background' | 'pose' | 'fashion' | 'product';
+      name: string;
+      tag: string;
+    }>;
+    creditsUsed?: number;
+    generationTime?: number;
+    projectId?: string;
+  }): Promise<GeneratedImageData> {
+    try {
+      const response = await api.post('/images', data);
+      return response.data.image as GeneratedImageData;
+    } catch (error: any) {
+      console.error('Save generated image error:', error);
+      throw error.response?.data || error;
+    }
+  }
 }
 
 export default new ImageService();
