@@ -16,9 +16,23 @@ export default function ProjectImageSlideshow({ images, nodes, projectName = 'Pr
   const [isHovered, setIsHovered] = useState(false);
 
   // Extract images from nodes if nodes provided
-  const allImages = images || (nodes ? nodes.flatMap(node => 
-    node.data?.generatedImages?.map((img: any) => img.url) || []
-  ) : []);
+  const allImages = images || (nodes ? nodes.flatMap(node => {
+    // Handle both direct URL strings and image objects
+    if (node.data?.generatedImages) {
+      return node.data.generatedImages.map((img: any) => {
+        // If it's already a string URL, use it directly
+        if (typeof img === 'string') return img;
+        // If it's an object with url property, extract it
+        if (img?.url) return img.url;
+        // Otherwise return null and filter it out
+        return null;
+      }).filter(Boolean);
+    }
+    return [];
+  }) : []);
+  
+  // Debug log
+  console.log('ProjectImageSlideshow - nodes:', nodes, 'allImages:', allImages);
 
   // Auto-play slideshow
   useEffect(() => {

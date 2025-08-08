@@ -94,6 +94,7 @@ const Dashboard = () => {
         status: selectedStatus === 'all' ? undefined : selectedStatus
       });
       
+      console.log('Dashboard - Loaded projects:', response.projects);
       setProjects(response.projects);
       setTotalProjects(response.totalProjects);
     } catch (error) {

@@ -1843,20 +1843,70 @@ export default function PortraitEditor({ onGenerateClick }: PortraitEditorProps)
                     <button 
                       onClick={() => {
                         // Add image to the portrait editor
-                        if (selectedImage && modelNode) {
-                          const currentImages = modelNode.data.generatedImages || [];
-                          // Check if image already exists
-                          const exists = currentImages.some((img: any) => img.url === selectedImage.url);
-                          if (!exists) {
-                            updateNode(modelNode.id, {
+                        if (selectedImage) {
+                          // If no modelNode exists, create one first
+                          if (!modelNode) {
+                            // Create a default model node
+                            const newNodeId = `model-${Date.now()}`;
+                            const newNode = {
+                              id: newNodeId,
+                              type: 'modelNode',
+                              position: { x: 250, y: 100 },
                               data: {
-                                ...modelNode.data,
-                                generatedImages: [...currentImages, selectedImage]
+                                label: 'Model',
+                                type: 'processing' as const,
+                                model: null,
+                                prompt: '',
+                                generatedImages: [selectedImage]
                               }
-                            });
-                            toast.success('Image added to your collection');
+                            };
+                            
+                            addNode(newNode);
+                            
+                            // Save to localStorage
+                            const projectId = window.location.search.includes('project=') 
+                              ? new URLSearchParams(window.location.search).get('project') 
+                              : null;
+                            if (projectId) {
+                              localStorage.setItem(`portrait-images-${projectId}`, JSON.stringify([selectedImage]));
+                            }
+                            
+                            toast.success('Image added to editor');
                           } else {
-                            toast('Image already in your collection', { icon: 'ℹ️' });
+                            // Add to existing modelNode
+                            const currentImages = modelNode.data.generatedImages || [];
+                            // Check if image already exists
+                            const exists = currentImages.some((img: any) => img.url === selectedImage.url);
+                            if (!exists) {
+                              const updatedImages = [...currentImages, selectedImage];
+                              updateNode(modelNode.id, {
+                                ...modelNode.data,
+                                generatedImages: updatedImages
+                              });
+                              
+                              // Save to localStorage
+                              const projectId = window.location.search.includes('project=') 
+                                ? new URLSearchParams(window.location.search).get('project') 
+                                : null;
+                              if (projectId) {
+                                localStorage.setItem(`portrait-images-${projectId}`, JSON.stringify(updatedImages));
+                              }
+                              
+                              // Save to project
+                              if (currentProject && updateProject) {
+                                updateProject({
+                                  nodes: nodes.map(n => 
+                                    n.id === modelNode.id 
+                                      ? { ...n, data: { ...n.data, generatedImages: updatedImages } }
+                                      : n
+                                  )
+                                });
+                              }
+                              
+                              toast.success('Image added to your collection');
+                            } else {
+                              toast('Image already in your collection', { icon: 'ℹ️' });
+                            }
                           }
                         }
                         setShowImageModal(false);
