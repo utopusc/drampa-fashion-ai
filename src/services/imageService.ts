@@ -56,7 +56,7 @@ class ImageService {
       if (params?.sortBy) queryParams.append('sortBy', params.sortBy);
 
       const response = await api.get(`/images?${queryParams.toString()}`);
-      return response.data;
+      return response.data as ImagesResponse;
     } catch (error: any) {
       console.error('Get images error:', error);
       throw error.response?.data || error;
@@ -66,7 +66,7 @@ class ImageService {
   async getImageDetails(imageId: string): Promise<{ success: boolean; image: GeneratedImageData }> {
     try {
       const response = await api.get(`/images/${imageId}`);
-      return response.data;
+      return response.data as any;
     } catch (error: any) {
       console.error('Get image details error:', error);
       throw error.response?.data || error;
@@ -76,7 +76,7 @@ class ImageService {
   async toggleFavorite(imageId: string): Promise<{ success: boolean; isFavorite: boolean }> {
     try {
       const response = await api.patch(`/images/${imageId}/favorite`);
-      return response.data;
+      return response.data as any;
     } catch (error: any) {
       console.error('Toggle favorite error:', error);
       throw error.response?.data || error;
@@ -86,7 +86,7 @@ class ImageService {
   async deleteImage(imageId: string): Promise<{ success: boolean; message: string }> {
     try {
       const response = await api.delete(`/images/${imageId}`);
-      return response.data;
+      return response.data as any;
     } catch (error: any) {
       console.error('Delete image error:', error);
       throw error.response?.data || error;

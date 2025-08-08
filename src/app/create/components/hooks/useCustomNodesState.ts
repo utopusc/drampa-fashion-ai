@@ -19,7 +19,6 @@ export function useCustomNodesState(initialNodes: Node[]) {
                 newNodes[nodeIndex] = {
                   ...newNodes[nodeIndex],
                   position: { ...change.position },
-                  positionAbsolute: change.positionAbsolute ? { ...change.positionAbsolute } : undefined,
                 };
               }
             }
@@ -54,12 +53,6 @@ export function useCustomNodesState(initialNodes: Node[]) {
           case 'add':
             if (change.item) {
               newNodes.push({ ...change.item });
-            }
-            break;
-
-          case 'reset':
-            if (change.item) {
-              newNodes = change.item.map(n => ({ ...n }));
             }
             break;
         }

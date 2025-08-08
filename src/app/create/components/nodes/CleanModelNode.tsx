@@ -44,7 +44,7 @@ interface ModelNodeData {
 }
 
 export default function CleanModelNode({ id, data, selected }: NodeProps) {
-  const nodeData = data as ModelNodeData;
+  const nodeData = data as unknown as ModelNodeData;
   const { draggedItem } = useDrag();
   const { addNodes, getNode } = useReactFlow();
   const { user, updateUserCredits } = useAuth();
@@ -55,6 +55,27 @@ export default function CleanModelNode({ id, data, selected }: NodeProps) {
   const [generatedImages, setGeneratedImages] = useState<Array<{url: string, width: number, height: number, generatedSize?: string, generatedDims?: {width: number, height: number}}>>([]);
   const [showImages, setShowImages] = useState(false);
   const [modalImage, setModalImage] = useState<string | null>(null);
+  
+  // Component states - all hooks must be before any conditional returns
+  const [prompt, setPrompt] = useState(nodeData?.prompt || '');
+  const [tags, setTags] = useState<string[]>(nodeData?.tags || []);
+  const [styleItems, setStyleItems] = useState<StyleItem[]>(nodeData?.styleItems || []);
+  const [imageSize, setImageSize] = useState(nodeData?.imageSize || 'square_hd');
+  const [customWidth, setCustomWidth] = useState(nodeData?.customWidth || 1024);
+  const [customHeight, setCustomHeight] = useState(nodeData?.customHeight || 1024);
+  const [numImages, setNumImages] = useState(nodeData?.numImages || 1);
+  const [isExpanded, setIsExpanded] = useState(true);
+  const [isDraggingOver, setIsDraggingOver] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
+  const [fastFashionMode, setFastFashionMode] = useState(nodeData?.fastFashionMode || false);
+  
+  // Check if dragging over with compatible item
+  useEffect(() => {
+    if (draggedItem && draggedItem.type !== 'model') {
+      // We're dragging a compatible item
+      console.log('Dragging item:', draggedItem);
+    }
+  }, [draggedItem]);
   
   // Add null checks for model data
   if (!nodeData || !nodeData.model) {
@@ -67,29 +88,9 @@ export default function CleanModelNode({ id, data, selected }: NodeProps) {
     );
   }
   
-  const [prompt, setPrompt] = useState(nodeData.prompt || '');
-  const [tags, setTags] = useState<string[]>(nodeData.tags || []);
-  const [styleItems, setStyleItems] = useState<StyleItem[]>(nodeData.styleItems || []);
-  const [imageSize, setImageSize] = useState(nodeData.imageSize || 'square_hd');
-  const [customWidth, setCustomWidth] = useState(nodeData.customWidth || 1024);
-  const [customHeight, setCustomHeight] = useState(nodeData.customHeight || 1024);
-  const [numImages, setNumImages] = useState(nodeData.numImages || 1);
-  const [isExpanded, setIsExpanded] = useState(true);
-  const [isDraggingOver, setIsDraggingOver] = useState(false);
-  const [showSettings, setShowSettings] = useState(false);
-  const [fastFashionMode, setFastFashionMode] = useState(nodeData.fastFashionMode || false);
-  
   // Check if currently dragging a background or pose
   const isDraggingBackground = draggedItem && draggedItem.type === 'background';
   const isDraggingPose = draggedItem && draggedItem.type === 'pose';
-  
-  // Check if dragging over with compatible item
-  useEffect(() => {
-    if (draggedItem && draggedItem.type !== 'model') {
-      // We're dragging a compatible item
-      console.log('Dragging item:', draggedItem);
-    }
-  }, [draggedItem]);
 
   const imageSizes = [
     { 

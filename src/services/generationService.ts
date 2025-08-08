@@ -36,7 +36,7 @@ class GenerationService {
       console.log('Sending generation request:', params);
       const response = await api.post('/generation/generate', params);
       console.log('Generation response:', response.data);
-      return response.data;
+      return response.data as GenerationResponse;
     } catch (error: any) {
       console.error('Generation error full:', error);
       console.error('Response data:', error.response?.data);

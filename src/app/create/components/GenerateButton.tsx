@@ -34,16 +34,16 @@ export default function GenerateButton({ userBalance, onGenerate }: GenerateButt
     if (!modelNode) return 0;
     
     // Default to square_hd and 1 image for now
-    const imageSize = modelNode.data.imageSize || 'square_hd';
-    const numImages = modelNode.data.numImages || 1;
+    const imageSize = (modelNode.data as any).imageSize || 'square_hd';
+    const numImages = (modelNode.data as any).numImages || 1;
     const sizeCost = SIZE_COSTS[imageSize as keyof typeof SIZE_COSTS] || 200;
     return sizeCost * numImages;
   }, [modelNode]);
 
   // Check if we have the minimum required data
   const hasRequiredData = modelNode && 
-                         modelNode.data.model && 
-                         modelNode.data.prompt?.trim();
+                         (modelNode.data as any).model && 
+                         (modelNode.data as any).prompt?.trim();
 
   const canGenerate = hasRequiredData && 
                      userBalance >= cost && 
@@ -55,14 +55,14 @@ export default function GenerateButton({ userBalance, onGenerate }: GenerateButt
     setIsGenerating(true);
     try {
       // Build prompt with tags
-      let fullPrompt = modelNode.data.prompt || '';
-      if (modelNode.data.tags && modelNode.data.tags.length > 0) {
-        fullPrompt = `${fullPrompt}, ${modelNode.data.tags.join(', ')}`;
+      let fullPrompt = (modelNode.data as any).prompt || '';
+      if ((modelNode.data as any).tags && (modelNode.data as any).tags.length > 0) {
+        fullPrompt = `${fullPrompt}, ${(modelNode.data as any).tags.join(', ')}`;
       }
 
       // Get generation settings (with defaults)
-      const imageSize = modelNode.data.imageSize || 'square_hd';
-      const numImages = modelNode.data.numImages || 1;
+      const imageSize = (modelNode.data as any).imageSize || 'square_hd';
+      const numImages = (modelNode.data as any).numImages || 1;
       
       // Call Fal.ai API
       const stream = await fal.stream("workflows/Drampa/flux", {
@@ -70,7 +70,7 @@ export default function GenerateButton({ userBalance, onGenerate }: GenerateButt
           prompt: fullPrompt,
           image_size: imageSize,
           loras: {
-            [modelNode.data.model.id]: modelNode.data.model.loraUrl || ''
+            [(modelNode.data as any).model.id]: (modelNode.data as any).model.loraUrl || ''
           },
           num_images: numImages
         }
@@ -117,7 +117,7 @@ export default function GenerateButton({ userBalance, onGenerate }: GenerateButt
     );
   }
 
-  if (!modelNode.data.prompt?.trim()) {
+  if (!(modelNode.data as any).prompt?.trim()) {
     return (
       <div className="px-4 py-2 bg-muted rounded-lg">
         <p className="text-sm text-muted-foreground">Enter a prompt to generate</p>
@@ -135,6 +135,7 @@ export default function GenerateButton({ userBalance, onGenerate }: GenerateButt
       </div>
       
       <button
+        data-generate-button
         onClick={handleGenerate}
         disabled={!canGenerate}
         className={`bg-primary text-primary-foreground px-6 py-2.5 rounded-lg font-medium text-sm flex items-center gap-2 transition-all ${

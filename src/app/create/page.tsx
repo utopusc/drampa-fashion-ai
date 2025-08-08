@@ -1,26 +1,25 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
-import PipelineEditorV3 from "./components/PipelineEditorV3";
+import PortraitEditor from "./components/PortraitEditor";
 import GenerateButton from "./components/GenerateButton";
 import { Toaster } from "react-hot-toast";
 import { ArrowLeftIcon, Save, Loader2, Edit3, Sparkles } from "lucide-react";
 import Link from "next/link";
 import { formatCreditsAsDollars } from "@/lib/format";
 import useProjectStore from "@/store/projectStore";
+import { usePipelineStore } from "@/store/pipelineStore";
 import { toast } from "sonner";
-import ImageGallery from "./components/ImageGallery";
 
-export default function CreatePage() {
+function CreatePageContent() {
   const { user, loading } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
   const [userBalance, setUserBalance] = useState(0);
   const [isEditingName, setIsEditingName] = useState(false);
   const [projectName, setProjectName] = useState('');
-  const [showGallery, setShowGallery] = useState(false);
   
   // Project store
   const { 
@@ -31,8 +30,13 @@ export default function CreatePage() {
     updateProject,
     isSaving,
     hasUnsavedChanges,
-    lastSaved 
+    lastSaved,
+    clearProject,
+    setIsEditingProjectName
   } = useProjectStore();
+  
+  // Pipeline store
+  const { clearPipeline, loadPipeline } = usePipelineStore();
 
   useEffect(() => {
     if (!loading && !user) {
@@ -42,14 +46,41 @@ export default function CreatePage() {
       
       // Load or create project
       const projectId = searchParams.get('project');
-      if (projectId) {
-        loadProject(projectId).catch((error) => {
+      if (projectId && projectId !== currentProject?._id) {
+        // Clear pipeline before loading new project
+        clearPipeline();
+        // Load project only if it's different from current one
+        loadProject(projectId).then((project) => {
+          // Load nodes and edges to pipeline store
+          if (project.nodes && project.edges) {
+            // Convert ProjectNode to PipelineNode format
+            const pipelineNodes = project.nodes.map((node: any) => ({
+              id: node.id,
+              type: node.type,
+              position: node.position,
+              data: {
+                ...node.data,
+                label: node.data.model?.name || 'Model',
+                type: 'processing' as const,
+              },
+            }));
+            loadPipeline(pipelineNodes, project.edges);
+          }
+        }).catch((error) => {
           toast.error('Failed to load project');
           router.push('/dashboard');
         });
-      } else {
+      } else if (!projectId) {
+        // Clear any existing project and pipeline first
+        clearProject();
+        clearPipeline();
         // Create new project if no ID provided
-        createProject('Untitled Project').catch((error) => {
+        createProject('Untitled Project').then((project) => {
+          // Update URL with new project ID without reloading
+          const url = new URL(window.location.href);
+          url.searchParams.set('project', project._id);
+          window.history.pushState({}, '', url.toString());
+        }).catch((error) => {
           toast.error('Failed to create project');
           router.push('/dashboard');
         });
@@ -68,6 +99,7 @@ export default function CreatePage() {
   const handleRenameProject = async () => {
     if (!currentProject || !projectName.trim() || projectName === currentProject.name) {
       setIsEditingName(false);
+      setIsEditingProjectName(false);
       return;
     }
     
@@ -75,9 +107,11 @@ export default function CreatePage() {
       await updateProject({ name: projectName });
       toast.success('Project renamed successfully');
       setIsEditingName(false);
+      setIsEditingProjectName(false);
     } catch (error) {
       toast.error('Failed to rename project');
       setProjectName(currentProject.name);
+      setIsEditingProjectName(false);
     }
   };
 
@@ -127,6 +161,7 @@ export default function CreatePage() {
                   type="button"
                   onClick={() => {
                     setIsEditingName(false);
+                    setIsEditingProjectName(false);
                     setProjectName(currentProject?.name || '');
                   }}
                   className="text-sm text-muted-foreground hover:text-foreground"
@@ -141,7 +176,10 @@ export default function CreatePage() {
                 </h1>
                 {currentProject && (
                   <button
-                    onClick={() => setIsEditingName(true)}
+                    onClick={() => {
+                      setIsEditingName(true);
+                      setIsEditingProjectName(true);
+                    }}
                     className="p-1 hover:bg-muted rounded transition-colors"
                   >
                     <Edit3 className="w-4 h-4 text-muted-foreground" />
@@ -156,14 +194,6 @@ export default function CreatePage() {
         </div>
         
         <div className="flex items-center gap-3">
-          {/* Gallery Button */}
-          <button
-            onClick={() => setShowGallery(true)}
-            className="flex items-center gap-2 px-3 py-2 text-sm bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors"
-          >
-            <Sparkles className="w-4 h-4" />
-            Gallery
-          </button>
           
           {/* Save indicator */}
           {(isSaving || hasUnsavedChanges) && (
@@ -203,22 +233,21 @@ export default function CreatePage() {
           <span className="text-sm text-muted-foreground">
             Balance: <span className="font-medium text-foreground">{formatCreditsAsDollars(userBalance)}</span>
           </span>
-          <GenerateButton
-            userBalance={userBalance}
-            onGenerate={(cost) => setUserBalance(prev => prev - cost)}
-          />
         </div>
       </header>
       
       <div className="flex-1 overflow-hidden">
-        <PipelineEditorV3 />
+        <PortraitEditor 
+          onGenerateClick={() => {
+            // This will be handled by the GenerateButton in the header
+            const generateBtn = document.querySelector('[data-generate-button]');
+            if (generateBtn) {
+              (generateBtn as HTMLButtonElement).click();
+            }
+          }}
+        />
       </div>
       
-      {/* Image Gallery */}
-      <ImageGallery 
-        isOpen={showGallery}
-        onClose={() => setShowGallery(false)}
-      />
       
       <Toaster 
         position="bottom-center"
@@ -232,5 +261,17 @@ export default function CreatePage() {
         }}
       />
     </div>
+  );
+}
+
+export default function CreatePage() {
+  return (
+    <Suspense fallback={
+      <div className="h-screen flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      </div>
+    }>
+      <CreatePageContent />
+    </Suspense>
   );
 }

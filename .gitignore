@@ -51,3 +51,56 @@ Thumbs.db
 /backend/.env
 /backend/dist
 /backend/build
+/backend/*.log
+/backend/check-*.js
+/backend/create-*.js
+/backend/debug-*.js
+/backend/fix-*.js
+/backend/reset-*.js
+/backend/test-*.js
+/backend/scripts/
+
+# deployment files
+*.tar.gz
+deploy*.sh
+fix-*.sh
+.env.production
+
+# test files
+test-*.js
+*-test.js
+quick-*.js
+simple-*.js
+complete-*.js
+debug-*.js
+check-*.js
+/test-results
+/playwright-report
+playwright.config.ts
+/tests
+
+# screenshots
+/screenshots
+*.png
+*.webp
+*.jpg
+
+# uploads
+/public/uploads/
+
+# backup files
+*.backup
+*.backup2
+*.backup3
+*.broken
+*.bak
+
+# production config
+ecosystem.config.js
+production-*.md
+cloudflare-*.md
+IMMEDIATE-*.md
+
+# logs
+*.log
+dev.log

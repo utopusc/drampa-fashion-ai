@@ -110,7 +110,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setUser(null);
   };
 
-  const updateProfile = async (profileData: { name?: string; email?: string }): Promise<{ success: boolean; message?: string }> => {
+  const updateProfile = async (profileData: { name?: string; email?: string; profileImage?: string }): Promise<{ success: boolean; message?: string }> => {
     try {
       const token = authService.getToken();
       if (!token) {
@@ -122,7 +122,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (response.success && response.data) {
         setUser(response.data.user);
         authService.saveUser(response.data.user);
-        return { success: true, message: 'Profile updated successfully.' };
+        return { success: true, message: response.message || 'Profile updated successfully.' };
       } else {
         return { 
           success: false, 

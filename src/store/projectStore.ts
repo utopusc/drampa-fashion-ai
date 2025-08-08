@@ -14,10 +14,11 @@ interface ProjectStore {
   // Auto-save
   autoSaveEnabled: boolean;
   hasUnsavedChanges: boolean;
+  isEditingProjectName: boolean;
 
   // Actions
   createProject: (name?: string) => Promise<Project>;
-  loadProject: (id: string) => Promise<void>;
+  loadProject: (id: string) => Promise<Project>;
   updateProject: (updates: Partial<Project>) => Promise<void>;
   saveProject: () => Promise<void>;
   deleteProject: (id: string) => Promise<void>;
@@ -32,6 +33,7 @@ interface ProjectStore {
   setAutoSave: (enabled: boolean) => void;
   clearProject: () => void;
   setError: (error: string | null) => void;
+  setIsEditingProjectName: (isEditing: boolean) => void;
 }
 
 const useProjectStore = create<ProjectStore>()(
@@ -39,16 +41,17 @@ const useProjectStore = create<ProjectStore>()(
     (set, get) => {
       // Debounced auto-save function
       const debouncedAutoSave = debounce(async () => {
-        const { currentProject, autoSaveEnabled, hasUnsavedChanges } = get();
+        const { currentProject, autoSaveEnabled, hasUnsavedChanges, isEditingProjectName } = get();
         
         console.log('Auto-save triggered:', {
           hasProject: !!currentProject,
           autoSaveEnabled,
           hasUnsavedChanges,
+          isEditingProjectName,
           nodesCount: currentProject?.nodes?.length || 0
         });
         
-        if (!currentProject || !autoSaveEnabled || !hasUnsavedChanges) return;
+        if (!currentProject || !autoSaveEnabled || !hasUnsavedChanges || isEditingProjectName) return;
 
         set({ isSaving: true });
         
@@ -80,6 +83,7 @@ const useProjectStore = create<ProjectStore>()(
         lastSaved: null,
         autoSaveEnabled: true,
         hasUnsavedChanges: false,
+        isEditingProjectName: false,
 
         createProject: async (name = 'Untitled Project') => {
           set({ isLoading: true, error: null });
@@ -103,15 +107,23 @@ const useProjectStore = create<ProjectStore>()(
         },
 
         loadProject: async (id: string) => {
-          set({ isLoading: true, error: null });
+          // Clear any existing project data first
+          set({ 
+            currentProject: null,
+            hasUnsavedChanges: false,
+            isLoading: true, 
+            error: null 
+          });
           
           try {
             const project = await projectService.getProject(id);
             set({
               currentProject: project,
               isLoading: false,
-              hasUnsavedChanges: false
+              hasUnsavedChanges: false,
+              lastSaved: new Date(project.lastModified)
             });
+            return project;
           } catch (error: any) {
             set({
               error: error.response?.data?.message || 'Failed to load project',
@@ -269,6 +281,10 @@ const useProjectStore = create<ProjectStore>()(
 
         setError: (error: string | null) => {
           set({ error });
+        },
+
+        setIsEditingProjectName: (isEditing: boolean) => {
+          set({ isEditingProjectName: isEditing });
         }
       };
     },

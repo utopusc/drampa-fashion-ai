@@ -9,8 +9,11 @@ import { AuroraText } from "@/components/magicui/aurora-text";
 import { FeatureCard4 } from "@/components/ui/feature-card-4";
 import { formatCreditsAsDollars } from "@/lib/format";
 import projectService, { ProjectListItem } from "@/services/projectService";
+import { Camera, Package2, Ghost } from "lucide-react";
 import useProjectStore from "@/store/projectStore";
+import { usePipelineStore } from "@/store/pipelineStore";
 import ProjectPreview from "@/components/ProjectPreview";
+import ProjectImageSlideshow from "@/components/ProjectImageSlideshow";
 import { 
   Plus, 
   Clock, 
@@ -19,7 +22,8 @@ import {
   Copy, 
   MoreVertical,
   FolderOpen,
-  Archive
+  Archive,
+  Sparkles
 } from "lucide-react";
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
 import { formatDistanceToNow } from 'date-fns';
@@ -29,6 +33,7 @@ const Dashboard = () => {
   const { user, loading } = useAuth();
   const router = useRouter();
   const { createProject } = useProjectStore();
+  const { clearPipeline } = usePipelineStore();
   
   const [projects, setProjects] = useState<ProjectListItem[]>([]);
   const [loadingProjects, setLoadingProjects] = useState(true);
@@ -38,6 +43,35 @@ const Dashboard = () => {
   const [deletingProjectId, setDeletingProjectId] = useState<string | null>(null);
   const [renamingProjectId, setRenamingProjectId] = useState<string | null>(null);
   const [newProjectName, setNewProjectName] = useState('');
+
+  // Helper function to detect project type
+  const getProjectType = (project: ProjectListItem) => {
+    // Check if project has nodes with data
+    if (project.nodes && project.nodes.length > 0) {
+      const firstNode = project.nodes[0];
+      
+      // Check for generation type in node data
+      if (firstNode.data?.generationType) {
+        switch (firstNode.data.generationType) {
+          case 'on-model':
+            return { icon: Camera, label: 'On-Model', color: 'bg-blue-500' };
+          case 'flat-lay':
+            return { icon: Package2, label: 'Flat Lay', color: 'bg-green-500' };
+          case 'mannequin':
+            return { icon: Ghost, label: 'Mannequin', color: 'bg-purple-500' };
+          default:
+            return { icon: Camera, label: 'Fashion', color: 'bg-orange-500' };
+        }
+      }
+      
+      // Check for portrait mode
+      if (firstNode.data?.isPortraitMode) {
+        return { icon: Camera, label: 'Portrait', color: 'bg-pink-500' };
+      }
+    }
+    
+    return { icon: Camera, label: 'Fashion', color: 'bg-orange-500' };
+  };
 
   useEffect(() => {
     if (!loading && !user) {
@@ -72,6 +106,8 @@ const Dashboard = () => {
 
   const handleCreateProject = async () => {
     try {
+      // Clear pipeline store before creating new project
+      clearPipeline();
       const project = await createProject();
       router.push(`/create?project=${project._id}`);
     } catch (error) {
@@ -79,7 +115,12 @@ const Dashboard = () => {
     }
   };
 
-  const handleDeleteProject = async (projectId: string) => {
+  const handleDeleteProject = async (projectId: string, projectName: string) => {
+    // Show confirmation dialog
+    const confirmed = window.confirm(`Are you sure you want to delete "${projectName}"? This action cannot be undone.`);
+    
+    if (!confirmed) return;
+    
     try {
       setDeletingProjectId(projectId);
       await projectService.deleteProject(projectId);
@@ -103,16 +144,22 @@ const Dashboard = () => {
   };
 
   const handleRenameProject = async (projectId: string) => {
-    if (!newProjectName.trim()) return;
+    if (!newProjectName.trim()) {
+      setRenamingProjectId(null);
+      setNewProjectName('');
+      return;
+    }
     
     try {
-      await projectService.renameProject(projectId, newProjectName);
+      await projectService.renameProject(projectId, newProjectName.trim());
       toast.success('Project renamed successfully');
       setRenamingProjectId(null);
       setNewProjectName('');
       loadProjects();
     } catch (error) {
       toast.error('Failed to rename project');
+      setRenamingProjectId(null);
+      setNewProjectName('');
     }
   };
 
@@ -191,46 +238,46 @@ const Dashboard = () => {
         >
           <div className="flex items-center justify-between mb-8">
             <div>
-              <h2 className="text-2xl font-bold text-foreground">Your Projects</h2>
-              <p className="text-muted-foreground">Manage and edit your fashion projects</p>
+              <h2 className="text-3xl font-bold text-foreground mb-2">Fashion Collections</h2>
+              <p className="text-muted-foreground text-lg">Create stunning AI-powered fashion photography</p>
             </div>
             <button
               onClick={handleCreateProject}
-              className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-xl hover:bg-primary/90 transition-colors"
+              className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-full hover:shadow-lg hover:shadow-orange-500/25 transition-all duration-200 font-medium"
             >
-              <Plus className="w-5 h-5" />
-              New Project
+              <Sparkles className="w-5 h-5" />
+              New Collection
             </button>
           </div>
 
           {/* Status Filter */}
-          <div className="flex gap-2 mb-6">
+          <div className="flex gap-3 mb-8 p-1 bg-gray-100 dark:bg-gray-800 rounded-full w-fit">
             <button
               onClick={() => setSelectedStatus('all')}
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+              className={`px-6 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
                 selectedStatus === 'all'
-                  ? 'bg-primary text-primary-foreground'
-                  : 'bg-muted text-muted-foreground hover:bg-muted/80'
+                  ? 'bg-white dark:bg-gray-900 text-orange-600 shadow-md'
+                  : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100'
               }`}
             >
-              All Projects
+              All Collections
             </button>
             <button
               onClick={() => setSelectedStatus('draft')}
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+              className={`px-6 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
                 selectedStatus === 'draft'
-                  ? 'bg-primary text-primary-foreground'
-                  : 'bg-muted text-muted-foreground hover:bg-muted/80'
+                  ? 'bg-white dark:bg-gray-900 text-orange-600 shadow-md'
+                  : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100'
               }`}
             >
               Drafts
             </button>
             <button
               onClick={() => setSelectedStatus('published')}
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+              className={`px-6 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
                 selectedStatus === 'published'
-                  ? 'bg-primary text-primary-foreground'
-                  : 'bg-muted text-muted-foreground hover:bg-muted/80'
+                  ? 'bg-white dark:bg-gray-900 text-orange-600 shadow-md'
+                  : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100'
               }`}
             >
               Published
@@ -249,21 +296,23 @@ const Dashboard = () => {
               ))}
             </div>
           ) : projects.length === 0 ? (
-            <div className="bg-card rounded-xl border border-border p-12">
+            <div className="bg-gradient-to-br from-orange-50 to-pink-50 dark:from-orange-950/20 dark:to-pink-950/20 rounded-2xl border border-orange-200 dark:border-orange-800/30 p-16">
               <div className="text-center">
-                <FolderOpen className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
-                <h3 className="text-xl font-semibold text-foreground mb-2">No projects yet</h3>
-                <p className="text-muted-foreground mb-6">
+                <div className="w-20 h-20 bg-gradient-to-r from-orange-500 to-pink-500 rounded-full flex items-center justify-center mx-auto mb-6">
+                  <Sparkles className="w-10 h-10 text-white" />
+                </div>
+                <h3 className="text-2xl font-bold text-foreground mb-3">Start Your Fashion Journey</h3>
+                <p className="text-muted-foreground text-lg mb-8 max-w-md mx-auto">
                   {selectedStatus === 'all' 
-                    ? "Create your first project to get started"
-                    : `No ${selectedStatus} projects found`}
+                    ? "Create your first collection and bring your fashion ideas to life with AI"
+                    : `No ${selectedStatus} collections found`}
                 </p>
                 {selectedStatus === 'all' && (
                   <button
                     onClick={handleCreateProject}
-                    className="px-6 py-3 bg-primary text-primary-foreground rounded-xl hover:bg-primary/90 transition-colors"
+                    className="px-8 py-4 bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-full hover:shadow-lg hover:shadow-orange-500/25 transition-all duration-200 font-medium text-lg"
                   >
-                    Create First Project
+                    Create First Collection
                   </button>
                 )}
               </div>
@@ -278,29 +327,42 @@ const Dashboard = () => {
                     initial={{ opacity: 0, scale: 0.9 }}
                     animate={{ opacity: 1, scale: 1 }}
                     exit={{ opacity: 0, scale: 0.9 }}
-                    className="group bg-card rounded-xl border border-border overflow-hidden hover:shadow-lg transition-all"
+                    className="group bg-card rounded-2xl border border-border overflow-hidden hover:shadow-xl hover:border-orange-200 dark:hover:border-orange-800 transition-all duration-300"
                   >
                     <Link href={`/create?project=${project._id}`}>
-                      <div className="aspect-video bg-muted relative overflow-hidden">
+                      <div className="aspect-video bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 relative overflow-hidden">
                         {project.thumbnail ? (
                           <img 
                             src={project.thumbnail} 
                             alt={project.name}
-                            className="w-full h-full object-cover"
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                           />
                         ) : (
-                          <ProjectPreview 
+                          <ProjectImageSlideshow 
                             nodes={project.nodes || []} 
                             className="w-full h-full"
                           />
                         )}
-                        <div className="absolute top-2 right-2 px-2 py-1 bg-black/50 backdrop-blur-sm rounded text-xs text-white">
+                        {/* Project Type Badge */}
+                        {(() => {
+                          const projectType = getProjectType(project);
+                          const Icon = projectType.icon;
+                          return (
+                            <div className={`absolute top-3 left-3 px-3 py-1.5 ${projectType.color} backdrop-blur-sm rounded-full flex items-center gap-1.5 text-white shadow-lg`}>
+                              <Icon className="w-3.5 h-3.5" />
+                              <span className="text-xs font-medium">{projectType.label}</span>
+                            </div>
+                          );
+                        })()}
+                        
+                        {/* Status Badge */}
+                        <div className="absolute top-3 right-3 px-3 py-1.5 bg-white/90 dark:bg-black/50 backdrop-blur-sm rounded-full text-xs font-medium capitalize">
                           {project.status}
                         </div>
                       </div>
                     </Link>
                     
-                    <div className="p-4">
+                    <div className="p-5">
                       {renamingProjectId === project._id ? (
                         <form 
                           onSubmit={(e) => {
@@ -314,12 +376,12 @@ const Dashboard = () => {
                             value={newProjectName}
                             onChange={(e) => setNewProjectName(e.target.value)}
                             placeholder={project.name}
-                            className="flex-1 px-2 py-1 bg-background border border-border rounded text-sm"
+                            className="flex-1 px-3 py-1.5 bg-background border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                             autoFocus
                           />
                           <button
                             type="submit"
-                            className="text-xs text-primary hover:text-primary/80"
+                            className="text-xs text-orange-500 hover:text-orange-600 font-medium"
                           >
                             Save
                           </button>
@@ -335,7 +397,7 @@ const Dashboard = () => {
                           </button>
                         </form>
                       ) : (
-                        <h3 className="font-semibold text-foreground mb-2 truncate">
+                        <h3 className="font-semibold text-lg text-foreground mb-2 truncate group-hover:text-orange-600 transition-colors">
                           {project.name}
                         </h3>
                       )}
@@ -349,16 +411,16 @@ const Dashboard = () => {
                         <DropdownMenu.Root>
                           <DropdownMenu.Trigger asChild>
                             <button 
-                              className="p-1 hover:bg-muted rounded-lg transition-colors"
+                              className="p-1.5 hover:bg-orange-100 dark:hover:bg-orange-900/20 rounded-lg transition-colors group-hover:opacity-100 opacity-0"
                               onClick={(e) => e.stopPropagation()}
                             >
-                              <MoreVertical className="w-4 h-4" />
+                              <MoreVertical className="w-4 h-4 text-gray-600 dark:text-gray-400" />
                             </button>
                           </DropdownMenu.Trigger>
                           
                           <DropdownMenu.Portal>
                             <DropdownMenu.Content 
-                              className="bg-popover border border-border rounded-lg shadow-lg p-1 min-w-[160px]"
+                              className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl shadow-lg p-1.5 min-w-[180px] z-50"
                               sideOffset={5}
                             >
                               <DropdownMenu.Item
@@ -392,7 +454,7 @@ const Dashboard = () => {
                               
                               <DropdownMenu.Item
                                 className="flex items-center gap-2 px-3 py-2 text-sm rounded hover:bg-destructive/10 text-destructive cursor-pointer"
-                                onClick={() => handleDeleteProject(project._id)}
+                                onClick={() => handleDeleteProject(project._id, project.name)}
                                 disabled={deletingProjectId === project._id}
                               >
                                 <Trash2 className="w-4 h-4" />

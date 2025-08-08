@@ -26,6 +26,8 @@ export interface ProjectNode {
     imageSize?: string;
     numImages?: number;
     styleItems?: StyleItem[];
+    generatedImages?: any[];
+    [key: string]: any; // Allow additional properties
   };
 }
 
@@ -42,6 +44,7 @@ export interface Project {
     zoom: number;
   };
   thumbnail?: string;
+  uiState?: any;
   lastModified: Date;
   createdAt: Date;
   updatedAt: Date;
@@ -75,7 +78,7 @@ class ProjectService {
     viewport?: any;
   }) {
     const response = await api.post('/projects', data);
-    return response.data.project;
+    return (response.data as any).project;
   }
 
   // Get user's projects
@@ -98,13 +101,13 @@ class ProjectService {
   // Get single project
   async getProject(id: string) {
     const response = await api.get(`/projects/${id}`);
-    return response.data.project as Project;
+    return (response.data as any).project as Project;
   }
 
   // Update project
   async updateProject(id: string, data: Partial<Project>) {
     const response = await api.put(`/projects/${id}`, data);
-    return response.data.project;
+    return (response.data as any).project;
   }
 
   // Auto-save project (for frequent updates)
@@ -114,31 +117,31 @@ class ProjectService {
     viewport: any;
   }) {
     const response = await api.patch(`/projects/${id}/autosave`, data);
-    return response.data;
+    return response.data as any;
   }
 
   // Delete project
   async deleteProject(id: string) {
     const response = await api.delete(`/projects/${id}`);
-    return response.data;
+    return response.data as any;
   }
 
   // Duplicate project
   async duplicateProject(id: string) {
     const response = await api.post(`/projects/${id}/duplicate`);
-    return response.data.project;
+    return (response.data as any).project;
   }
 
   // Rename project
   async renameProject(id: string, name: string) {
     const response = await api.put(`/projects/${id}`, { name });
-    return response.data.project;
+    return (response.data as any).project;
   }
 
   // Update project status
   async updateProjectStatus(id: string, status: 'draft' | 'published' | 'archived') {
     const response = await api.put(`/projects/${id}`, { status });
-    return response.data.project;
+    return (response.data as any).project;
   }
 }
 

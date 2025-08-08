@@ -4,8 +4,9 @@ import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { User, Lock, Mail, Camera, Trash2, Bell, Shield, Globe, Palette } from "lucide-react";
+import { User, Lock, Mail, Camera, Trash2, Bell, Shield, Globe, Palette, Key } from "lucide-react";
 import { motion } from "framer-motion";
+import fashnService from "@/services/fashnService";
 
 interface TabProps {
   id: string;
@@ -18,6 +19,7 @@ const tabs: TabProps[] = [
   { id: "security", label: "Security", icon: <Lock className="w-4 h-4" /> },
   { id: "notifications", label: "Notifications", icon: <Bell className="w-4 h-4" /> },
   { id: "preferences", label: "Preferences", icon: <Palette className="w-4 h-4" /> },
+  { id: "fashionai", label: "Fashion AI", icon: <Key className="w-4 h-4" /> },
 ];
 
 export default function SettingsPage() {
@@ -39,6 +41,16 @@ export default function SettingsPage() {
     confirmPassword: "",
   });
   
+  // Fashion AI states
+  const [apiKey, setApiKey] = useState('');
+  const [showApiKey, setShowApiKey] = useState(false);
+  const [isVerifying, setIsVerifying] = useState(false);
+  const [credits, setCredits] = useState<{
+    total: number;
+    subscription: number;
+    on_demand: number;
+  } | null>(null);
+  
   const { user, updateProfile, changePassword } = useAuth();
 
   // Initialize profile data when user is loaded
@@ -50,6 +62,26 @@ export default function SettingsPage() {
       });
     }
   }, [user]);
+
+  // Load saved API key
+  useEffect(() => {
+    const savedKey = localStorage.getItem('fashn_api_key');
+    if (savedKey) {
+      setApiKey(savedKey);
+      fashnService.setApiKey(savedKey);
+      checkCredits(savedKey);
+    }
+  }, []);
+
+  const checkCredits = async (key: string) => {
+    try {
+      fashnService.setApiKey(key);
+      const creditsData = await fashnService.getCredits();
+      setCredits(creditsData.credits);
+    } catch (error) {
+      console.error('Failed to fetch credits:', error);
+    }
+  };
 
   const handleProfileUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -108,6 +140,51 @@ export default function SettingsPage() {
       }
     } catch (error) {
       setErrorMessage("Bir hata oluştu. Lütfen tekrar deneyin.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleVerifyApiKey = async () => {
+    if (!apiKey.trim()) {
+      setErrorMessage('Please enter an API key');
+      return;
+    }
+
+    setIsVerifying(true);
+    setErrorMessage('');
+    setSuccessMessage('');
+
+    try {
+      fashnService.setApiKey(apiKey);
+      const creditsData = await fashnService.getCredits();
+      setCredits(creditsData.credits);
+      setSuccessMessage('API key verified successfully!');
+    } catch (error: any) {
+      setErrorMessage(error.message || 'Invalid API key');
+      setCredits(null);
+    } finally {
+      setIsVerifying(false);
+    }
+  };
+
+  const handleSaveApiKey = async () => {
+    if (!apiKey.trim()) {
+      setErrorMessage('Please enter an API key');
+      return;
+    }
+
+    setIsLoading(true);
+    setErrorMessage('');
+    setSuccessMessage('');
+
+    try {
+      // Save to localStorage
+      localStorage.setItem('fashn_api_key', apiKey);
+      fashnService.setApiKey(apiKey);
+      setSuccessMessage('API key saved successfully!');
+    } catch (error) {
+      setErrorMessage('Failed to save API key');
     } finally {
       setIsLoading(false);
     }
@@ -446,6 +523,108 @@ export default function SettingsPage() {
                     <option value="Europe/Istanbul">İstanbul (GMT+3)</option>
                     <option value="UTC">UTC (GMT+0)</option>
                   </select>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        );
+
+      case "fashionai":
+        return (
+          <div className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Key className="w-5 h-5" />
+                  Fashion AI API Configuration
+                </CardTitle>
+                <CardDescription>
+                  Configure your FASHN API key for virtual try-on features
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-foreground mb-2">
+                    API Key
+                  </label>
+                  <div className="relative">
+                    <input
+                      type={showApiKey ? "text" : "password"}
+                      value={apiKey}
+                      onChange={(e) => setApiKey(e.target.value)}
+                      placeholder="Enter your FASHN API key"
+                      className="block w-full rounded-lg border border-input bg-background px-3 py-2 pr-24 text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 sm:text-sm font-mono"
+                    />
+                    <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-2">
+                      <button
+                        onClick={() => setShowApiKey(!showApiKey)}
+                        className="p-1 hover:bg-muted rounded transition-colors"
+                      >
+                        {showApiKey ? "Hide" : "Show"}
+                      </button>
+                      <Button
+                        onClick={handleVerifyApiKey}
+                        disabled={isVerifying || !apiKey.trim()}
+                        size="sm"
+                        variant="outline"
+                      >
+                        {isVerifying ? "Verifying..." : "Verify"}
+                      </Button>
+                    </div>
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-2">
+                    Don&apos;t have an API key? 
+                    <a 
+                      href="https://fashn.ai" 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="text-primary hover:underline ml-1"
+                    >
+                      Get one from FASHN
+                    </a>
+                  </p>
+                </div>
+
+                {credits && (
+                  <div className="bg-muted/50 rounded-lg p-4 space-y-3">
+                    <h4 className="font-medium flex items-center gap-2">
+                      <Shield className="w-4 h-4" />
+                      API Credits Balance
+                    </h4>
+                    <div className="grid grid-cols-3 gap-4">
+                      <div className="text-center">
+                        <p className="text-2xl font-bold">{credits.total}</p>
+                        <p className="text-xs text-muted-foreground">Total Credits</p>
+                      </div>
+                      <div className="text-center">
+                        <p className="text-2xl font-bold">{credits.subscription}</p>
+                        <p className="text-xs text-muted-foreground">Subscription</p>
+                      </div>
+                      <div className="text-center">
+                        <p className="text-2xl font-bold">{credits.on_demand}</p>
+                        <p className="text-xs text-muted-foreground">On-Demand</p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                <div className="bg-primary/5 rounded-lg p-4">
+                  <h4 className="font-medium mb-2">How it works</h4>
+                  <ul className="text-sm text-muted-foreground space-y-1">
+                    <li>• Each virtual try-on costs 1 credit ($0.075)</li>
+                    <li>• Credits are deducted only for successful generations</li>
+                    <li>• Failed attempts are not charged</li>
+                    <li>• Your API key is stored locally and securely</li>
+                  </ul>
+                </div>
+
+                <div className="flex gap-3 pt-4">
+                  <Button
+                    onClick={handleSaveApiKey}
+                    disabled={isLoading || !apiKey.trim()}
+                  >
+                    {isLoading ? "Saving..." : "Save API Key"}
+                  </Button>
                 </div>
               </CardContent>
             </Card>

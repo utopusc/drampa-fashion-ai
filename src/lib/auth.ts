@@ -1,6 +1,6 @@
 import { User } from '@/types/auth';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5001/api';
+const API_BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5001';
 
 export interface LoginCredentials {
   email: string;
@@ -48,7 +48,7 @@ class AuthService {
 
   async login(credentials: LoginCredentials): Promise<AuthResponse | ApiError> {
     try {
-      const response = await fetch(`${API_BASE_URL}/auth/login`, {
+      const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
         method: 'POST',
         headers: this.getHeaders(),
         body: JSON.stringify(credentials),
@@ -73,7 +73,7 @@ class AuthService {
 
   async register(credentials: RegisterCredentials): Promise<AuthResponse | ApiError> {
     try {
-      const response = await fetch(`${API_BASE_URL}/auth/register`, {
+      const response = await fetch(`${API_BASE_URL}/api/auth/register`, {
         method: 'POST',
         headers: this.getHeaders(),
         body: JSON.stringify(credentials),
@@ -98,7 +98,7 @@ class AuthService {
 
   async getProfile(token: string): Promise<{ success: boolean; data?: { user: User }; message?: string }> {
     try {
-      const response = await fetch(`${API_BASE_URL}/auth/me`, {
+      const response = await fetch(`${API_BASE_URL}/api/users/profile`, {
         method: 'GET',
         headers: this.getHeaders(token),
       });
@@ -106,8 +106,9 @@ class AuthService {
       const data = await response.json();
       
       // Convert credits from backend to cents
-      if (data.success && data.data?.user) {
-        data.data.user.credits = (data.data.user.credits || 0) * 100;
+      if (data.success && data.data) {
+        data.data.credits = (data.data.credits || 0) * 100;
+        return { success: true, data: { user: data.data } };
       }
       
       return data;
@@ -120,15 +121,19 @@ class AuthService {
     }
   }
 
-  async updateProfile(token: string, profileData: { name?: string; email?: string }): Promise<{ success: boolean; data?: { user: User }; message?: string }> {
+  async updateProfile(token: string, profileData: { name?: string; email?: string; profileImage?: string }): Promise<{ success: boolean; data?: { user: User }; message?: string }> {
     try {
-      const response = await fetch(`${API_BASE_URL}/auth/profile`, {
+      const response = await fetch(`${API_BASE_URL}/api/users/profile`, {
         method: 'PUT',
         headers: this.getHeaders(token),
         body: JSON.stringify(profileData),
       });
 
       const data = await response.json();
+      if (data.success && data.data) {
+        data.data.credits = (data.data.credits || 0) * 100;
+        return { success: true, data: { user: data.data }, message: data.message };
+      }
       return data;
     } catch (error) {
       console.error('Update profile error:', error);
@@ -141,7 +146,7 @@ class AuthService {
 
   async changePassword(token: string, passwordData: { currentPassword: string; newPassword: string }): Promise<{ success: boolean; message: string }> {
     try {
-      const response = await fetch(`${API_BASE_URL}/auth/password`, {
+      const response = await fetch(`${API_BASE_URL}/api/users/password`, {
         method: 'PUT',
         headers: this.getHeaders(token),
         body: JSON.stringify(passwordData),
@@ -165,9 +170,10 @@ class AuthService {
       // Set cookie for middleware to check (7 days = 604800 seconds)
       const expiryDate = new Date();
       expiryDate.setDate(expiryDate.getDate() + 7);
-      // Don't use Secure flag on localhost
+      // Don't use Secure flag on localhost or HTTP connections
       const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-      const secureFlag = isLocalhost ? '' : '; Secure';
+      const isHTTPS = window.location.protocol === 'https:';
+      const secureFlag = (isLocalhost || !isHTTPS) ? '' : '; Secure';
       document.cookie = `auth-token=${token}; path=/; expires=${expiryDate.toUTCString()}; SameSite=Lax${secureFlag}`;
     }
   }

@@ -68,3 +68,15 @@ export const hasErrorInput = [
   // ring color
   "ring-red-200 dark:ring-red-700/30",
 ];
+
+// Get the backend URL for API calls
+export function getBackendUrl() {
+  return process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5001'
+}
+
+// Get the full backend URL for images and static assets
+export function getImageUrl(path: string) {
+  if (path.startsWith('http')) return path
+  const backendUrl = getBackendUrl()
+  return `${backendUrl}${path.startsWith('/') ? path : `/${path}`}`
+}

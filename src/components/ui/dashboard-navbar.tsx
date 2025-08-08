@@ -21,6 +21,7 @@ export default function DashboardNavbar() {
   const navigation = [
     { name: "Home", href: "/dashboard" },
     { name: "Gallery", href: "/dashboard/gallery" },
+    { name: "Fashion AI", href: "/dashboard/fashion-ai" },
     { name: "Pricing", href: "/pricing" },
   ];
 

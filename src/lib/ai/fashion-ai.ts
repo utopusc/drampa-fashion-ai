@@ -58,7 +58,7 @@ class FashionAIService {
       fit_preference: options.fitPreference || 'regular',
     });
     
-    return response.output_url;
+    return (response as any).output_url;
   }
 
   /**
@@ -71,7 +71,7 @@ class FashionAIService {
       preserve_face: options.preserveFace !== false,
     });
     
-    return response.output_url;
+    return (response as any).output_url;
   }
 
   /**
@@ -84,7 +84,7 @@ class FashionAIService {
       quality: options.quality || 95,
     });
     
-    return response.output_url;
+    return (response as any).output_url;
   }
 
   /**
@@ -98,7 +98,7 @@ class FashionAIService {
       })),
     });
     
-    return response.output_urls;
+    return (response as any).output_urls;
   }
 
   /**
@@ -111,7 +111,7 @@ class FashionAIService {
       },
     });
     
-    return response.data;
+    return response.data as {status: string, progress: number, result?: string};
   }
 }
 

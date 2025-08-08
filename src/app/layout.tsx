@@ -6,6 +6,7 @@ import { Outfit } from "next/font/google";
 import { Providers } from "./providers";
 import "./globals.css";
 import { usePathname } from "next/navigation";
+import FashnKeyManager from "@/components/FashnKeyManager";
 
 const outfit = Outfit({
   variable: "--font-outfit",
@@ -32,6 +33,7 @@ export default function RootLayout({
         className={`${outfit.variable} antialiased font-sans bg-background`}
       >
         <Providers>
+          <FashnKeyManager />
           <div className="relative">
             {!isDashboard && !isCreate && (
               <LandingNavbar />

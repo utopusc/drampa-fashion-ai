@@ -19,6 +19,7 @@ import UnifiedSidebar from './sidebar/UnifiedSidebar';
 import { useCustomNodesState } from './hooks/useCustomNodesState';
 import { DragProvider, useDrag } from './DragContext';
 import useProjectStore from '@/store/projectStore';
+import { ProjectNode } from '@/services/projectService';
 
 // Custom node types
 const nodeTypes = {
@@ -220,15 +221,15 @@ function PipelineEditorV3() {
         type: node.type,
         position: node.position,
         data: {
-          model: node.data.model,
-          prompt: node.data.prompt,
-          imageSize: node.data.imageSize,
-          numImages: node.data.numImages,
-          styleItems: node.data.styleItems,
+          model: node.data.model || { id: '', name: '', image: '' },
+          prompt: node.data.prompt || '',
+          imageSize: node.data.imageSize || '1:1',
+          numImages: node.data.numImages || 1,
+          styleItems: node.data.styleItems || [],
         },
       }));
       console.log('PipelineEditor: Calling updateNodes with', projectNodes.length, 'nodes');
-      updateNodes(projectNodes);
+      updateNodes(projectNodes as ProjectNode[]);
     }, 500); // Debounce for 500ms
     
     return () => clearTimeout(timeoutId);

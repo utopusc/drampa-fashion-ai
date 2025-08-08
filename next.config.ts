@@ -28,6 +28,16 @@ const nextConfig: NextConfig = {
         protocol: 'https',
         hostname: 'images.unsplash.com',
         pathname: '/**',
+      },
+      {
+        protocol: 'http',
+        hostname: '31.220.81.177',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'cdn.fashn.ai',
+        pathname: '/**',
       }
     ],
   },
