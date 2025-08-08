@@ -26,6 +26,10 @@ const userSchema = new mongoose.Schema({
     type: String,
     default: null,
   },
+  profileImage: {
+    type: String,
+    default: null,
+  },
   role: {
     type: String,
     enum: ['user', 'admin'],
@@ -49,6 +53,27 @@ const userSchema = new mongoose.Schema({
       type: String,
       default: 'en',
     },
+    notifications: {
+      email: {
+        type: Boolean,
+        default: true,
+      },
+      push: {
+        type: Boolean,
+        default: false,
+      },
+      marketing: {
+        type: Boolean,
+        default: false,
+      },
+    },
+    defaultImageSize: {
+      type: String,
+      default: 'square_hd',
+    },
+    favoriteModels: [{
+      type: String,
+    }],
   },
 }, {
   timestamps: true,
@@ -56,7 +81,13 @@ const userSchema = new mongoose.Schema({
 
 // Hash password before saving
 userSchema.pre('save', async function(next) {
+  // Only hash the password if it has been modified (or is new)
   if (!this.isModified('password')) {
+    return next();
+  }
+  
+  // Check if password is already hashed (bcrypt hashes start with $2a$ or $2b$)
+  if (this.password.startsWith('$2a$') || this.password.startsWith('$2b$')) {
     return next();
   }
   

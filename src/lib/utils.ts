@@ -71,7 +71,7 @@ export const hasErrorInput = [
 
 // Get the backend URL for API calls
 export function getBackendUrl() {
-  return process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5001'
+  return 'http://31.220.81.177'
 }
 
 // Get the full backend URL for images and static assets

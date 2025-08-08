@@ -1,6 +1,6 @@
 import { User } from '@/types/auth';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5001';
+const API_BASE_URL = 'http://31.220.81.177';
 
 export interface LoginCredentials {
   email: string;

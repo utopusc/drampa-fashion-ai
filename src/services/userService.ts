@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5001';
+const API_URL = 'http://31.220.81.177';
 
 class UserService {
   private getAuthHeaders() {
