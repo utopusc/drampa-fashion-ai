@@ -340,7 +340,8 @@ const Dashboard = () => {
                         ) : (
                           <ProjectImageSlideshow 
                             nodes={project.nodes || []} 
-                            className="w-full h-full"
+                            projectName={project.name}
+                            className="w-full h-full aspect-video"
                           />
                         )}
                         {/* Project Type Badge */}

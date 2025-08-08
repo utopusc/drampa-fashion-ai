@@ -45,7 +45,7 @@ export default function ProjectImageSlideshow({ images, nodes, projectName = 'Pr
 
   if (allImages.length === 0) {
     return (
-      <div className="aspect-[3/4] bg-muted rounded-lg flex items-center justify-center">
+      <div className={`${className || ''} bg-muted flex items-center justify-center`}>
         <p className="text-muted-foreground text-sm">No images yet</p>
       </div>
     );
@@ -53,7 +53,7 @@ export default function ProjectImageSlideshow({ images, nodes, projectName = 'Pr
 
   return (
     <div 
-      className={`relative aspect-[3/4] bg-muted rounded-lg overflow-hidden group ${className || ''}`}
+      className={`relative bg-muted overflow-hidden group ${className || ''}`}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
