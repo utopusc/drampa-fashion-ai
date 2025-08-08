@@ -188,6 +188,33 @@ export default function PortraitEditor({ onGenerateClick }: PortraitEditorProps)
   // Project store integration
   const { currentProject, updateProject } = useProjectStore();
   
+  // Load images from localStorage on mount and project change
+  useEffect(() => {
+    const projectId = window.location.search.includes('project=') 
+      ? new URLSearchParams(window.location.search).get('project') 
+      : null;
+      
+    if (projectId) {
+      const savedImages = localStorage.getItem(`portrait-images-${projectId}`);
+      if (savedImages) {
+        try {
+          const images = JSON.parse(savedImages);
+          if (Array.isArray(images) && images.length > 0) {
+            // Update modelNode with saved images
+            if (modelNode && updateNode) {
+              updateNode(modelNode.id, {
+                ...modelNode.data,
+                generatedImages: images
+              });
+            }
+          }
+        } catch (error) {
+          console.error('Error loading saved images:', error);
+        }
+      }
+    }
+  }, [currentProject?._id]);
+  
   // Size definitions (body types)
   const sizes = [
     { value: 'xs', label: 'XS', description: 'extra small, very thin body type' },
