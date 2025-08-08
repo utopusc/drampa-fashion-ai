@@ -1798,7 +1798,7 @@ export default function PortraitEditor({ onGenerateClick }: PortraitEditorProps)
                             });
                             toast.success('Image added to your collection');
                           } else {
-                            toast.info('Image already in your collection');
+                            toast('Image already in your collection', { icon: 'ℹ️' });
                           }
                         }
                         setShowImageModal(false);
