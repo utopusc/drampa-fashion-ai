@@ -47,6 +47,7 @@ import productService, { Product } from '@/services/productService';
 import fashnService from '@/services/fashnService';
 import projectService from '@/services/projectService';
 import { getImageUrl } from '@/lib/utils';
+import FashnApiInit from './FashnApiInit';
 
 // Vertical menu items for sidebar
 const createMenuItems = (activeTab: string, setActiveTab: (tab: string) => void): VerticalMenuBarItem[] => [
@@ -711,7 +712,9 @@ export default function PortraitEditor({ onGenerateClick }: PortraitEditorProps)
   };
 
   return (
-    <div className="h-full flex">
+    <>
+      <FashnApiInit />
+      <div className="h-full flex">
       {/* Left Vertical Menu Bar */}
       <motion.div 
         ref={menuRef}
@@ -1788,5 +1791,6 @@ export default function PortraitEditor({ onGenerateClick }: PortraitEditorProps)
         }
       `}</style>
     </div>
+    </>
   );
 }

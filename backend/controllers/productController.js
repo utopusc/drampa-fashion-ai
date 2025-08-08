@@ -47,7 +47,7 @@ exports.createProduct = async (req, res) => {
       // Create unique filename
       const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
       const filename = `product-${uniqueSuffix}${path.extname(req.file.originalname)}`;
-      const uploadPath = path.join(__dirname, '../../public/uploads/products', filename);
+      const uploadPath = path.join(__dirname, '../uploads/products', filename);
       
       // Ensure directory exists
       await fs.mkdir(path.dirname(uploadPath), { recursive: true });
@@ -224,7 +224,7 @@ exports.updateProduct = async (req, res) => {
       // Create unique filename
       const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
       const filename = `product-${uniqueSuffix}${path.extname(req.file.originalname)}`;
-      const uploadPath = path.join(__dirname, '../../public/uploads/products', filename);
+      const uploadPath = path.join(__dirname, '../uploads/products', filename);
       
       // Ensure directory exists
       await fs.mkdir(path.dirname(uploadPath), { recursive: true });

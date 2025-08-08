@@ -34,7 +34,7 @@ app.use('/uploads', (req, res, next) => {
   res.header('Access-Control-Allow-Methods', 'GET, HEAD');
   res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
   next();
-}, express.static(path.join(__dirname, '../public/uploads')));
+}, express.static(path.join(__dirname, 'uploads')));
 
 // Connect to MongoDB
 mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/drampa')
