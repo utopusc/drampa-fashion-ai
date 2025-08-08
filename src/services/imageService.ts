@@ -111,8 +111,8 @@ class ImageService {
     projectId?: string;
   }): Promise<GeneratedImageData> {
     try {
-      const response = await api.post('/images', data);
-      return response.data.image as GeneratedImageData;
+      const response = await api.post<{ success: boolean; image: GeneratedImageData }>('/images', data);
+      return response.data.image;
     } catch (error: any) {
       console.error('Save generated image error:', error);
       throw error.response?.data || error;

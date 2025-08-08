@@ -652,6 +652,9 @@ export default function PortraitEditor({ onGenerateClick }: PortraitEditorProps)
       
       const modelImageBase64 = await modelBase64Promise;
       
+      // Track generation time
+      const startTime = Date.now();
+      
       // Generate virtual try-on
       const output = await fashnService.generateVirtualTryOn(
         modelImageBase64,
