@@ -667,19 +667,47 @@ export default function PortraitEditor({ onGenerateClick }: PortraitEditorProps)
         }
       );
       
-      // Add generated images to the model node
-      const newImages = output.map(url => ({
-        url,
-        prompt: `${modelNode.data.prompt} wearing ${selectedProduct.name}`,
-        width: 1024,
-        height: 1536,
-        seed: Math.floor(Math.random() * 1000000)
+      // Save each image to gallery
+      const savedImages = await Promise.all(output.map(async (url) => {
+        try {
+          const savedImage = await imageService.saveGeneratedImage({
+            url,
+            prompt: `Virtual try-on: ${selectedProduct.name} on ${modelNode.data.model?.name || 'model'}`,
+            model: modelNode.data.model || { id: '', name: '', image: '' },
+            styleItems: [
+              { type: 'product' as const, name: selectedProduct.name, tag: selectedProduct.type }
+            ],
+            creditsUsed: 5,
+            generationTime: Date.now() - startTime,
+            projectId: window.location.search.includes('project=') 
+              ? new URLSearchParams(window.location.search).get('project') || undefined 
+              : undefined
+          });
+          return {
+            url,
+            prompt: `${modelNode.data.prompt} wearing ${selectedProduct.name}`,
+            width: 1024,
+            height: 1536,
+            seed: Math.floor(Math.random() * 1000000),
+            _id: savedImage._id
+          };
+        } catch (error) {
+          console.error('Failed to save image to gallery:', error);
+          return {
+            url,
+            prompt: `${modelNode.data.prompt} wearing ${selectedProduct.name}`,
+            width: 1024,
+            height: 1536,
+            seed: Math.floor(Math.random() * 1000000)
+          };
+        }
       }));
       
+      // Add generated images to the model node
       updateNode(modelNode.id, {
         data: {
           ...modelNode.data,
-          generatedImages: [...modelNode.data.generatedImages, ...newImages]
+          generatedImages: [...modelNode.data.generatedImages, ...savedImages]
         }
       });
       

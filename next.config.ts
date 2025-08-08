@@ -36,6 +36,11 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: 'https',
+        hostname: '31.220.81.177',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
         hostname: 'cdn.fashn.ai',
         pathname: '/**',
       }

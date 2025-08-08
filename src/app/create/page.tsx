@@ -6,7 +6,8 @@ import { useAuth } from "@/contexts/AuthContext";
 import PortraitEditor from "./components/PortraitEditor";
 import GenerateButton from "./components/GenerateButton";
 import { Toaster } from "react-hot-toast";
-import { ArrowLeftIcon, Save, Loader2, Edit3, Sparkles } from "lucide-react";
+import { ArrowLeftIcon, Save, Loader2, Edit3, Sparkles, X } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import { formatCreditsAsDollars } from "@/lib/format";
 import useProjectStore from "@/store/projectStore";
@@ -141,52 +142,22 @@ function CreatePageContent() {
             <ArrowLeftIcon className="w-5 h-5 text-muted-foreground" />
           </Link>
           <div>
-            {isEditingName ? (
-              <form
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  handleRenameProject();
-                }}
-                className="flex items-center gap-2"
-              >
-                <input
-                  type="text"
-                  value={projectName}
-                  onChange={(e) => setProjectName(e.target.value)}
-                  onBlur={handleRenameProject}
-                  className="px-2 py-1 text-lg font-semibold bg-transparent border-b-2 border-primary focus:outline-none"
-                  autoFocus
-                />
+            <div className="flex items-center gap-2">
+              <h1 className="text-lg font-semibold text-foreground">
+                {currentProject?.name || 'Fashion Design Studio'}
+              </h1>
+              {currentProject && (
                 <button
-                  type="button"
                   onClick={() => {
-                    setIsEditingName(false);
-                    setIsEditingProjectName(false);
-                    setProjectName(currentProject?.name || '');
+                    setIsEditingName(true);
+                    setIsEditingProjectName(true);
                   }}
-                  className="text-sm text-muted-foreground hover:text-foreground"
+                  className="p-1 hover:bg-muted rounded transition-colors"
                 >
-                  Cancel
+                  <Edit3 className="w-4 h-4 text-muted-foreground" />
                 </button>
-              </form>
-            ) : (
-              <div className="flex items-center gap-2">
-                <h1 className="text-lg font-semibold text-foreground">
-                  {currentProject?.name || 'Fashion Design Studio'}
-                </h1>
-                {currentProject && (
-                  <button
-                    onClick={() => {
-                      setIsEditingName(true);
-                      setIsEditingProjectName(true);
-                    }}
-                    className="p-1 hover:bg-muted rounded transition-colors"
-                  >
-                    <Edit3 className="w-4 h-4 text-muted-foreground" />
-                  </button>
-                )}
-              </div>
-            )}
+              )}
+            </div>
             <p className="text-sm text-muted-foreground">
               {hasUnsavedChanges ? 'Unsaved changes' : lastSaved ? `Last saved ${new Date(lastSaved).toLocaleTimeString()}` : 'Create your perfect look'}
             </p>
@@ -260,6 +231,88 @@ function CreatePageContent() {
           },
         }}
       />
+      
+      {/* Project Name Edit Modal */}
+      <AnimatePresence>
+        {isEditingName && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
+            onClick={() => {
+              setIsEditingName(false);
+              setIsEditingProjectName(false);
+              setProjectName(currentProject?.name || '');
+            }}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="bg-background rounded-2xl p-6 max-w-md w-full mx-4 border border-border shadow-xl"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-xl font-semibold text-foreground">Edit Project Name</h2>
+                <button
+                  onClick={() => {
+                    setIsEditingName(false);
+                    setIsEditingProjectName(false);
+                    setProjectName(currentProject?.name || '');
+                  }}
+                  className="p-1 hover:bg-muted rounded-lg transition-colors"
+                >
+                  <X className="w-5 h-5 text-muted-foreground" />
+                </button>
+              </div>
+              
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  handleRenameProject();
+                }}
+                className="space-y-4"
+              >
+                <div>
+                  <label className="text-sm font-medium text-muted-foreground block mb-2">
+                    Project Name
+                  </label>
+                  <input
+                    type="text"
+                    value={projectName}
+                    onChange={(e) => setProjectName(e.target.value)}
+                    className="w-full px-4 py-2 text-lg bg-muted border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                    placeholder="Enter project name..."
+                    autoFocus
+                  />
+                </div>
+                
+                <div className="flex gap-3">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsEditingName(false);
+                      setIsEditingProjectName(false);
+                      setProjectName(currentProject?.name || '');
+                    }}
+                    className="flex-1 px-4 py-2 bg-muted hover:bg-muted/80 text-foreground font-medium rounded-lg transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={!projectName.trim() || projectName === currentProject?.name}
+                    className="flex-1 px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    Save
+                  </button>
+                </div>
+              </form>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
