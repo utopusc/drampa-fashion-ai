@@ -6,6 +6,7 @@ import { AuroraText } from "@/components/magicui/aurora-text";
 import { FeatureCard4 } from "@/components/ui/feature-card-4";
 import { FooterSection } from "@/components/sections/footer-section";
 import { HeroSection } from "@/components/sections/hero-section";
+import UserTypeSection from "@/components/sections/UserTypeSection";
 
 export default function Home() {
   const features = [
@@ -47,6 +48,9 @@ export default function Home() {
   return (
     <main className="flex flex-col items-center justify-center w-full">
       <HeroSection />
+      
+      {/* User Type Section - Creator ve İşletmeler */}
+      <UserTypeSection />
       
       {/* Dashboard Content */}
       <div className="w-full bg-background">

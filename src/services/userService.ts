@@ -10,6 +10,62 @@ class UserService {
     };
   }
 
+  async login(email: string, password: string) {
+    try {
+      const response = await axios.post<{token: string; user: any}>(`${API_URL}/api/auth/login`, {
+        email,
+        password,
+      });
+      
+      if (response.data.token) {
+        localStorage.setItem('drampa_token', response.data.token);
+        localStorage.setItem('drampa_user', JSON.stringify(response.data.user));
+      }
+      
+      return response.data;
+    } catch (error: any) {
+      console.error('Login error:', error);
+      throw new Error(error.response?.data?.message || 'Failed to login');
+    }
+  }
+
+  async register(email: string, password: string, name: string) {
+    try {
+      const response = await axios.post<{token: string; user: any}>(`${API_URL}/api/auth/register`, {
+        email,
+        password,
+        name,
+      });
+      
+      if (response.data.token) {
+        localStorage.setItem('drampa_token', response.data.token);
+        localStorage.setItem('drampa_user', JSON.stringify(response.data.user));
+      }
+      
+      return response.data;
+    } catch (error: any) {
+      console.error('Register error:', error);
+      throw new Error(error.response?.data?.message || 'Failed to register');
+    }
+  }
+
+  async logout() {
+    localStorage.removeItem('drampa_token');
+    localStorage.removeItem('drampa_user');
+  }
+
+  async getCurrentUser() {
+    try {
+      const response = await axios.get(`${API_URL}/api/auth/me`, {
+        headers: this.getAuthHeaders(),
+      });
+      return response.data;
+    } catch (error: any) {
+      console.error('Get current user error:', error);
+      throw new Error(error.response?.data?.message || 'Failed to get current user');
+    }
+  }
+
   async getProfile() {
     try {
       const response = await axios.get(`${API_URL}/api/users/profile`, {

@@ -9,6 +9,7 @@ import { AnimatePresence, motion, useScroll } from "motion/react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
+import UserTypeModal from "@/components/auth/UserTypeModal";
 
 const INITIAL_WIDTH = "70rem";
 const MAX_WIDTH = "800px";
@@ -56,6 +57,8 @@ export function LandingNavbar() {
   const [hasScrolled, setHasScrolled] = useState(false);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [activeSection, setActiveSection] = useState("hero");
+  const [showUserTypeModal, setShowUserTypeModal] = useState(false);
+  const [redirectPath, setRedirectPath] = useState<"sign-in" | "sign-up">("sign-in");
 
   useEffect(() => {
     const handleScroll = () => {
@@ -130,18 +133,24 @@ export function LandingNavbar() {
                   </Link>
                 ) : (
                   <>
-                    <Link
+                    <button
                       className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors px-4 py-2 rounded-lg hover:bg-muted/50"
-                      href="/auth/sign-in"
+                      onClick={() => {
+                        setRedirectPath("sign-in");
+                        setShowUserTypeModal(true);
+                      }}
                     >
                       Sign In
-                    </Link>
-                <Link
+                    </button>
+                    <button
                       className="bg-primary text-primary-foreground h-8 hidden md:flex items-center justify-center text-sm font-medium tracking-wide rounded-full px-6 shadow-lg hover:shadow-xl transition-all"
-                      href="/auth/sign-up"
-                >
+                      onClick={() => {
+                        setRedirectPath("sign-up");
+                        setShowUserTypeModal(true);
+                      }}
+                    >
                       Get Started
-                </Link>
+                    </button>
                   </>
                 )}
               </div>
@@ -247,27 +256,40 @@ export function LandingNavbar() {
                   </Link>
                 ) : (
                   <div className="flex flex-col gap-2">
-                    <Link
-                      href="/auth/sign-in"
+                    <button
                       className="text-center py-3 px-6 rounded-lg font-medium border border-border"
-                      onClick={() => setIsDrawerOpen(false)}
+                      onClick={() => {
+                        setIsDrawerOpen(false);
+                        setRedirectPath("sign-in");
+                        setShowUserTypeModal(true);
+                      }}
                     >
                       Sign In
-                    </Link>
-                    <Link
-                      href="/auth/sign-up"
+                    </button>
+                    <button
                       className="bg-primary text-primary-foreground text-center py-3 px-6 rounded-lg font-medium"
-                      onClick={() => setIsDrawerOpen(false)}
+                      onClick={() => {
+                        setIsDrawerOpen(false);
+                        setRedirectPath("sign-up");
+                        setShowUserTypeModal(true);
+                      }}
                     >
                       Get Started
-                  </Link>
-                </div>
+                    </button>
+                  </div>
                 )}
               </div>
             </motion.div>
           </>
         )}
       </AnimatePresence>
+      
+      {/* User Type Modal */}
+      <UserTypeModal
+        isOpen={showUserTypeModal}
+        onClose={() => setShowUserTypeModal(false)}
+        redirectPath={redirectPath}
+      />
     </header>
   );
 }

@@ -22,6 +22,7 @@ export default function RootLayout({
   const pathname = usePathname();
   const isDashboard = pathname?.startsWith("/dashboard");
   const isCreate = pathname?.startsWith("/create");
+  const isAuth = pathname?.startsWith("/auth");
 
   return (
     <html lang="en" suppressHydrationWarning>
@@ -35,7 +36,7 @@ export default function RootLayout({
         <Providers>
           <FashnKeyManager />
           <div className="relative">
-            {!isDashboard && !isCreate && (
+            {!isDashboard && !isCreate && !isAuth && (
               <LandingNavbar />
             )}
             {children}
